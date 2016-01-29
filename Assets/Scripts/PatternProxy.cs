@@ -18,7 +18,7 @@ public class PatternProxy : MonoBehaviour {
 
     private Vertex _lastContact;
 
-    public int MyID;
+    internal int _myID;
 
     public float SegmentLifetime;
     public List<int> Players;
@@ -54,14 +54,14 @@ public class PatternProxy : MonoBehaviour {
     }
 
     private void EdgeFilledByPlayer(int playerID, int edgeId) {
-        if (playerID != MyID) {
-            _segments[edgeId].AddPlayer(Players.IndexOf(MyID));
+        if (playerID != _myID) {
+            _segments[edgeId].AddPlayer(Players.IndexOf(playerID));
         }
         
     }
 
     private void ServerLoaded(PatternModel patternModel, int myID) {
-        MyID = myID;
+        _myID = myID;
         _serverStatuses = ServerStatuses.Ready;
         _patternModel = patternModel;
         
@@ -165,7 +165,7 @@ public class PatternProxy : MonoBehaviour {
 
             foreach (Segment seg in _segments) {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
-                    seg.AddPlayer(Players.IndexOf(MyID));
+                    seg.AddPlayer(Players.IndexOf(_myID));
                     //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
                     _networkClient.NotifyFilledEdge(_segments.IndexOf(seg));
                 }
