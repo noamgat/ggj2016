@@ -5,10 +5,16 @@ using System.Collections.Generic;
 
 public class PatternProxy : MonoBehaviour {
 
-    public Segment SegmentPF;
+    public Vector2[] TargetPoints;
+    public int[] TargetSegments;
 
-    public List<Vertex> Verteces;
-    public List<Segment> Segments;
+    public Segment SegmentPF;
+    public Vertex VertexPF;
+
+    protected List<Vertex> Verteces = new List<Vertex>();
+    protected List<Segment> Segments = new List<Segment>();
+
+    private Vertex _lastContact;
 
     // Use this for initialization
     void Start () {
@@ -22,16 +28,30 @@ public class PatternProxy : MonoBehaviour {
 
     public void CreatePattern() {
 
-        Segments.Add(Instantiate(SegmentPF));
+        //stub place\
 
-        Segments[0].VertexA = Verteces[0];
-        Segments[0].VertexB = Verteces[1];
-        Segments[0].Place();
+        for (int i = 0; i < TargetPoints.Length; i++) {
+            Verteces.Add(Instantiate(VertexPF));
+            Verteces[Verteces.Count - 1].location = TargetPoints[i];
+            Verteces[Verteces.Count - 1].Place();
+        }
+
+
+        for (int i = 0; i < TargetSegments.Length / 2; i++) {
+            Segments.Add(Instantiate(SegmentPF));
+            Segments[i].VertexA = Verteces[TargetSegments[i * 2]];
+            Segments[i].VertexB = Verteces[TargetSegments[i * 2 + 1]];
+            Segments[i].Place();
+        }
+
+            
     }
 
-    [Serializable]
-    public class Vertex {
-        public Vector2 location;
+    internal void CheckCollision(Collider collider) {
+        Vertex vertex = collider.GetComponent<Vertex>();
+        if (vertex != null && _lastContact != vertex && Verteces.IndexOf(vertex) > -1) {
+            _lastContact = vertex;
+            print("123");
+        }
     }
-    
 }

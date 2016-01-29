@@ -4,8 +4,8 @@ using System.Collections;
 public class Segment : MonoBehaviour {
     
     
-    public PatternProxy.Vertex VertexA;
-    public PatternProxy.Vertex VertexB;
+    public Vertex VertexA;
+    public Vertex VertexB;
     
 
     public void Place() {
