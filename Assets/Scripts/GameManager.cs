@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour {
         IngameUI.SetActive(true);
         MainMenuUI.SetActive(false);
         // Ease in the camera 
-        HOTween.To(cam.transform, 1, new TweenParms().Prop("position", new Vector3(0.5f, 0.5f, -2.25f)).Ease(EaseType.EaseOutStrong));
+        HOTween.To(cam.transform, 1, new TweenParms().Prop("localPosition", new Vector3(0.5f, -0.9f, -1.3f)).Prop("localRotation", Quaternion.Euler(316, 0 , 0)).Ease(EaseType.EaseOutQuint));
     }
     
 

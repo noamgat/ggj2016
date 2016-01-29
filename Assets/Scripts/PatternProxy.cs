@@ -48,7 +48,23 @@ public class PatternProxy : MonoBehaviour {
 
     private void ServerLoaded(PatternModel patternModel, int myID) {
         MyID = myID;
-        CreatePattern(patternModel);
+        //CreatePattern(patternModel);
+        CreatePattern();
+        AdjustCollidersSize();
+    }
+
+    private void AdjustCollidersSize() {
+        foreach (Vertex verA in _verteces) {
+            foreach (Vertex verB in _verteces) {
+                if (verA != verB) {
+                    float dist = (verA.location - verB.location).magnitude;
+                    if (dist < 0.09f) {
+                        verA.SetColliderSize(dist * 0.35f);
+                        verB.SetColliderSize(dist * 0.35f);
+                    }
+                }
+            }
+        }
     }
 
     private void CreatePattern(PatternModel patternModel) {
