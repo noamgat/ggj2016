@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class PatternProxy : MonoBehaviour {
 
+    private enum ServerStatuses { Waiting, Ready, Initiated };
     
     public Vector2[] TargetPoints;
     public int[] TargetSegments;
@@ -22,11 +23,24 @@ public class PatternProxy : MonoBehaviour {
     public float SegmentLifetime;
     public List<int> Players;
 
-    private IGameClient _networkClient = new LocalGameClient();
+    //private IGameClient _networkClient = new LocalGameClient();
+    //private IGameClient _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
+    private IGameClient _networkClient;
 
+    private ServerStatuses _serverStatuses = ServerStatuses.Waiting;
+    private PatternModel _patternModel;
+
+    public bool UseLocal;
 
     // Use this for initialization
     void Start () {
+
+        if (UseLocal) {
+            _networkClient = new LocalGameClient();
+        } else {
+            _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
+        }
+        
 
         _networkClient.onLoaded += ServerLoaded;
         _networkClient.onEdgeFilled += EdgeFilledByPlayer;
@@ -48,9 +62,9 @@ public class PatternProxy : MonoBehaviour {
 
     private void ServerLoaded(PatternModel patternModel, int myID) {
         MyID = myID;
-        //CreatePattern(patternModel);
-        CreatePattern();
-        AdjustCollidersSize();
+        _serverStatuses = ServerStatuses.Ready;
+        _patternModel = patternModel;
+        
     }
 
     private void AdjustCollidersSize() {
@@ -160,5 +174,36 @@ public class PatternProxy : MonoBehaviour {
             _lastContact = vertex;
             
         }
+    }
+
+    void Update() {
+        if (_serverStatuses == ServerStatuses.Ready) {
+            CreatePattern(_patternModel);
+            //CreatePattern();
+            AdjustCollidersSize();
+            _serverStatuses = ServerStatuses.Initiated;
+        }
+    }
+
+    public void GeneratePatternJSON() {
+
+        string s = "{\n";
+        s += "\"points\": [\n";
+        
+        foreach (Vertex ver in _verteces) {
+            s += "[" + ver.location.x + ',' + ver.location.y + "],\n";
+        }
+        s += "]\n";
+        s += "\"edges\": [\n";
+
+        foreach (Segment seg in _segments) {
+            s += "[" + _verteces.IndexOf(seg.VertexA) + ',' + _verteces.IndexOf(seg.VertexB) + "],\n";
+        }
+        s += "]\n";
+
+        s += "}\n";
+
+        print( s);
+
     }
 }
