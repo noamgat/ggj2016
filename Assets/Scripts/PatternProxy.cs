@@ -37,11 +37,29 @@ public class PatternProxy : MonoBehaviour {
         }
 
 
-        for (int i = 0; i < TargetSegments.Length / 2; i++) {
+        for (int i = 0; i < TargetSegments.Length / 3; i++) {
+
+            int numOfDivisions = TargetSegments[i * 3 + 2];
+
+            for (int j = 0; j < numOfDivisions; j++) {
+
+                if (j < numOfDivisions - 1) {
+
+                } else {
+
+                }
+
+                Verteces.Add(Instantiate(VertexPF));
+                Verteces[Verteces.Count - 1].location = TargetPoints[i];
+                Verteces[Verteces.Count - 1].Place();
+
+            }
+
             Segments.Add(Instantiate(SegmentPF));
-            Segments[i].VertexA = Verteces[TargetSegments[i * 2]];
-            Segments[i].VertexB = Verteces[TargetSegments[i * 2 + 1]];
+            Segments[i].VertexA = Verteces[TargetSegments[i * 3]];
+            Segments[i].VertexB = Verteces[TargetSegments[i * 3 + 1]];
             Segments[i].Place();
+            Segments[i].State = Segment.States.Idle;
         }
 
             
@@ -50,8 +68,15 @@ public class PatternProxy : MonoBehaviour {
     internal void CheckCollision(Collider collider) {
         Vertex vertex = collider.GetComponent<Vertex>();
         if (vertex != null && _lastContact != vertex && Verteces.IndexOf(vertex) > -1) {
+
+            foreach (Segment seg in Segments) {
+                if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
+                    seg.State = Segment.States.Player;
+                }
+            }
+
             _lastContact = vertex;
-            print("123");
+            
         }
     }
 }

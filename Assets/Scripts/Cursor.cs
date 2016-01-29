@@ -32,8 +32,8 @@ public class Cursor : MonoBehaviour {
     }
 
 
-    void OnCollisionEnter(Collision collision) {
-        PatternProxyInst.CheckCollision(collision.collider);
+    void OnTriggerEnter(Collider collider) {
+        PatternProxyInst.CheckCollision(collider);
     }
 
 }
