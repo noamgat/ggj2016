@@ -11,10 +11,16 @@ public class PatternProxy : MonoBehaviour {
     public Segment SegmentPF;
     public Vertex VertexPF;
 
-    protected List<Vertex> Verteces = new List<Vertex>();
-    protected List<Segment> Segments = new List<Segment>();
+    private List<Vertex> _verteces = new List<Vertex>();
+    private List<Segment> _segments = new List<Segment>();
 
     private Vertex _lastContact;
+
+    public int MyID;
+
+    public float SegmentLifetime;
+    public List<int> Players;
+
 
     // Use this for initialization
     void Start () {
@@ -31,9 +37,9 @@ public class PatternProxy : MonoBehaviour {
         //stub place\
 
         for (int i = 0; i < TargetPoints.Length; i++) {
-            Verteces.Add(Instantiate(VertexPF));
-            Verteces[Verteces.Count - 1].location = TargetPoints[i];
-            Verteces[Verteces.Count - 1].Place();
+            _verteces.Add(Instantiate(VertexPF));
+            _verteces[_verteces.Count - 1].location = TargetPoints[i];
+            _verteces[_verteces.Count - 1].Place();
         }
 
 
@@ -41,8 +47,8 @@ public class PatternProxy : MonoBehaviour {
 
             int numOfDivisions = TargetSegments[i * 3 + 2];
 
-            Vertex absFrom = Verteces[TargetSegments[i * 3]];
-            Vertex absTo = Verteces[TargetSegments[i * 3 + 1]];
+            Vertex absFrom = _verteces[TargetSegments[i * 3]];
+            Vertex absTo = _verteces[TargetSegments[i * 3 + 1]];
             Vertex from;
             Vertex to = absFrom;
 
@@ -54,7 +60,7 @@ public class PatternProxy : MonoBehaviour {
 
                     to = Instantiate(VertexPF);
 
-                    Verteces.Add(to);
+                    _verteces.Add(to);
 
                     Vector2 trg = (absTo.location - absFrom.location);
                     trg = (trg / (float)numOfDivisions);
@@ -67,17 +73,17 @@ public class PatternProxy : MonoBehaviour {
                 } else {
                     to = absTo;
                 }
-
                 
-                Segments.Add(Instantiate(SegmentPF));
-                Segments[Segments.Count - 1].VertexA = from;
-                Segments[Segments.Count - 1].VertexB = to;
-                Segments[Segments.Count - 1].Place();
-                Segments[Segments.Count - 1].State = Segment.States.Idle;
+                Segment seg = Instantiate(SegmentPF);
+
+                _segments.Add(seg);
+                seg.Init(Players.Count, SegmentLifetime);
+                seg.VertexA = from;
+                seg.VertexB = to;
+                seg.Place();
+                
             }
 
-            
-            
             
         }
 
@@ -86,11 +92,11 @@ public class PatternProxy : MonoBehaviour {
 
     internal void CheckCollision(Collider collider) {
         Vertex vertex = collider.GetComponent<Vertex>();
-        if (vertex != null && _lastContact != vertex && Verteces.IndexOf(vertex) > -1) {
+        if (vertex != null && _lastContact != vertex && _verteces.IndexOf(vertex) > -1) {
 
-            foreach (Segment seg in Segments) {
+            foreach (Segment seg in _segments) {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
-                    seg.State = Segment.States.Player;
+                    seg.AddPlayer(Players.IndexOf(MyID));
                 }
             }
 

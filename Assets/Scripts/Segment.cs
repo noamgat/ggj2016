@@ -2,14 +2,21 @@
 using System.Collections;
 
 public class Segment : MonoBehaviour {
-
-    public enum States {Idle, Player, OtherPlayer, Both };
     
 
     public Vertex VertexA;
     public Vertex VertexB;
 
-    private States _state = States.Idle;
+    private float[] playerIndexes;
+
+    private int _numOPlayers;
+    private float _lifetime;
+
+    internal void Init(int numOPlayers, float lifetime) {
+        _numOPlayers = numOPlayers;
+        _lifetime = lifetime;
+        playerIndexes = new float[numOPlayers];
+    }
 
     public void Place() {
         transform.localPosition = VertexA.location;
@@ -18,8 +25,9 @@ public class Segment : MonoBehaviour {
         transform.localScale = new Vector3(1, 1, (VertexB.location - VertexA.location).magnitude);
     }
 
-    public States State{
-        get{
+    public void AddPlayer(int playerIndex){
+        playerIndexes[playerIndex] = 1;
+        /*get{
             return _state;
         }
         set{
@@ -32,7 +40,7 @@ public class Segment : MonoBehaviour {
                 case States.Player: mat.color = Color.green; break;
                 default : mat.color = Color.black; break;
             }
-        }
+        }*/
     }
 
 
@@ -43,6 +51,8 @@ public class Segment : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        for (int i = 0; i < playerIndexes.Length; i++) {
+            playerIndexes[i] -= Time.deltaTime / _lifetime;
+        }
 	}
 }
