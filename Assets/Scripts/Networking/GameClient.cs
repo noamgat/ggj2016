@@ -49,4 +49,15 @@ public class GameClient : MonoBehaviour {
 	void Update () {
 	
 	}
+
+	private class PatternModel {
+		public Vector2[] points;
+		public int[] edgePairs;
+	}
+
+	private class LoadMessage {
+		public int playerID;
+		public PatternModel pattern;
+	}
+
 }
