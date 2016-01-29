@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour {
 
     public GameObject MainMenuUI;
     public GameObject IngameUI;
-    
+    public Camera cam;
+
     // Current game state
     private enum States { Menu, Connecting, Ingame, Loss, Win }
     private States _state;
@@ -35,7 +36,8 @@ public class GameManager : MonoBehaviour {
         // Start the game 
         IngameUI.SetActive(true);
         MainMenuUI.SetActive(false);
-        
+        // Ease in the camera 
+        HOTween.To(cam.transform, 1, new TweenParms().Prop("position", new Vector3(0.5f, 0.5f, -2.25f)).Ease(EaseType.EaseOutStrong));
     }
     
 
