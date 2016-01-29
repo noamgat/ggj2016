@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class PatternProxy : MonoBehaviour {
 
+    
     public Vector2[] TargetPoints;
     public int[] TargetSegments;
 
@@ -21,20 +22,58 @@ public class PatternProxy : MonoBehaviour {
     public float SegmentLifetime;
     public List<int> Players;
 
+    private IGameClient _networkClient = new LocalGameClient();
+
 
     // Use this for initialization
     void Start () {
+
+        _networkClient.onLoaded += ServerLoaded;
+        _networkClient.onEdgeFilled += EdgeFilledByPlayer;
+        _networkClient.onLevelWon += LevelWon;
+
+        _networkClient.Load();
+    }
+
+    private void LevelWon() {
+        print("Won");
+    }
+
+    private void EdgeFilledByPlayer(int playerID, int edgeId) {
+        if (playerID != MyID) {
+            _segments[edgeId].AddPlayer(Players.IndexOf(MyID));
+        }
         
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    }
+
+    private void ServerLoaded(PatternModel patternModel, int myID) {
+        MyID = myID;
+        CreatePattern(patternModel);
+    }
+
+    private void CreatePattern(PatternModel patternModel) {
+        for (int i = 0; i < patternModel.points.Length; i++) {
+            _verteces.Add(Instantiate(VertexPF));
+            _verteces[_verteces.Count - 1].location = patternModel.points[i];
+            _verteces[_verteces.Count - 1].Place();
+        }
+
+
+        for (int i = 0; i < patternModel.edges.Count; i++) {
+            Segment seg = Instantiate(SegmentPF);
+
+            _segments.Add(seg);
+            seg.Init(Players.Count, SegmentLifetime);
+            seg.VertexA = _verteces[patternModel.edges[i][0]];
+            seg.VertexB = _verteces[patternModel.edges[i][1]];
+            seg.Place();
+        }
+    }
+    
 
     public void CreatePattern() {
 
-        //stub place\
+        //stub place
 
         for (int i = 0; i < TargetPoints.Length; i++) {
             _verteces.Add(Instantiate(VertexPF));
@@ -98,6 +137,7 @@ public class PatternProxy : MonoBehaviour {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
                     seg.AddPlayer(Players.IndexOf(MyID));
                     //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
+                    _networkClient.NotifyFilledEdge(_segments.IndexOf(seg));
                 }
             }
 
