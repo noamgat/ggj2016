@@ -195,10 +195,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1227622074}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f09f7382d080e4e6db4bcfe2300e9bef, type: 3}
+  m_Script: {fileID: 11500000, guid: e4175a0cfeab2435083d99c067679ffb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: ws://localhost:8000/receive
+  url: ws://localhost:8000/room
 --- !u!4 &1227622076
 Transform:
   m_ObjectHideFlags: 0
