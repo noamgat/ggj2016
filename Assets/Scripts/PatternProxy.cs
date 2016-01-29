@@ -97,6 +97,7 @@ public class PatternProxy : MonoBehaviour {
             foreach (Segment seg in _segments) {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
                     seg.AddPlayer(Players.IndexOf(MyID));
+                    //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
                 }
             }
 
