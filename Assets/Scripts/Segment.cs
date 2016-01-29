@@ -13,6 +13,7 @@ public class Segment : MonoBehaviour {
 
     public void Place() {
         transform.localPosition = VertexA.location;
+        transform.localPosition += new Vector3(0, 0, -0.02f);
         transform.localRotation = Quaternion.LookRotation(VertexB.location - VertexA.location, Vector3.back);
         transform.localScale = new Vector3(1, 1, (VertexB.location - VertexA.location).magnitude);
     }

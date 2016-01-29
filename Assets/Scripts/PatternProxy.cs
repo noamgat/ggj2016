@@ -41,25 +41,44 @@ public class PatternProxy : MonoBehaviour {
 
             int numOfDivisions = TargetSegments[i * 3 + 2];
 
+            Vertex absFrom = Verteces[TargetSegments[i * 3]];
+            Vertex absTo = Verteces[TargetSegments[i * 3 + 1]];
+            Vertex from;
+            Vertex to = absFrom;
+
             for (int j = 0; j < numOfDivisions; j++) {
+
+                from = to;
 
                 if (j < numOfDivisions - 1) {
 
-                } else {
+                    to = Instantiate(VertexPF);
 
+                    Verteces.Add(to);
+
+                    Vector2 trg = (absTo.location - absFrom.location);
+                    trg = (trg / (float)numOfDivisions);
+                    trg = trg * (float)(j + 1);
+
+                    to.location = absFrom.location + trg;
+                    to.Place();
+
+                    
+                } else {
+                    to = absTo;
                 }
 
-                Verteces.Add(Instantiate(VertexPF));
-                Verteces[Verteces.Count - 1].location = TargetPoints[i];
-                Verteces[Verteces.Count - 1].Place();
-
+                
+                Segments.Add(Instantiate(SegmentPF));
+                Segments[Segments.Count - 1].VertexA = from;
+                Segments[Segments.Count - 1].VertexB = to;
+                Segments[Segments.Count - 1].Place();
+                Segments[Segments.Count - 1].State = Segment.States.Idle;
             }
 
-            Segments.Add(Instantiate(SegmentPF));
-            Segments[i].VertexA = Verteces[TargetSegments[i * 3]];
-            Segments[i].VertexB = Verteces[TargetSegments[i * 3 + 1]];
-            Segments[i].Place();
-            Segments[i].State = Segment.States.Idle;
+            
+            
+            
         }
 
             
