@@ -4,8 +4,9 @@ using WebSocketSharp;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Threading;
 
-public class GameClient : IGameClient {
+public class GameClient : IGameClient, IDisposable {
 
 	private string url;
 	private WebSocket webSocket;
@@ -112,8 +113,11 @@ public class GameClient : IGameClient {
 		}));
 	}
 
+
+
 	public void Load ()
 	{
+		CloseWebSocketIfOpen ();
 		webSocket = new WebSocket (url);
 		webSocket.OnOpen += WebSocket_OnOpen;
 		webSocket.OnMessage += WebSocket_OnMessage;
@@ -127,7 +131,20 @@ public class GameClient : IGameClient {
 		webSocket.WaitTime = System.TimeSpan.FromSeconds (10);
 
 		Debug.Log ("About to connect");
-		webSocket.Connect ();
+		new Thread (webSocket.Connect).Start();
+		Debug.Log ("Sent connection request");
+	}
+
+	void CloseWebSocketIfOpen ()
+	{
+		if (webSocket != null) {
+			webSocket.Close ();
+			webSocket = null;
+		}
+	}
+
+	public void Dispose() {
+		CloseWebSocketIfOpen ();
 	}
 	#endregion
 }
