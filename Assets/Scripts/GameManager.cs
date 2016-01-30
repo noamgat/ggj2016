@@ -36,6 +36,12 @@ public class GameManager : MonoBehaviour {
     private int _numPlayers;
 	private int _numLevelsWon = 0;
 
+
+    public Texture[] LevelTextures;
+    public GameObject LevelBackground;
+
+    private int _currentLevel;
+
     // Use this for initialization
     void Start () {
         
@@ -67,6 +73,8 @@ public class GameManager : MonoBehaviour {
 
         IngameUI.SetActive(false);
         MainMenuUI.SetActive(true);
+
+        _currentLevel = -1;
     }
 
     private void KillNetwork() {
@@ -98,8 +106,10 @@ public class GameManager : MonoBehaviour {
         PatternProxyInst.UpdatePattern(patternModel);
         _pendingMainThreadAction = true;
         _pendingActions = PendingActions.StartRound;
-  
-    }
+
+        
+
+}
 
 
     private void ServerGameStarted() {
@@ -160,7 +170,9 @@ public class GameManager : MonoBehaviour {
                     FloorText.text = "";
                     break;
                 case PendingActions.StartRound:
+                    _currentLevel++;
 
+                    LevelBackground.GetComponent<Renderer>().material.mainTexture = LevelTextures[_currentLevel];
                     IngameUI.SetActive(true);
 					SoundManager.Instance.PlayBackgroundMusic ();
                     CamAnimator.SetTrigger("StartLevel");
@@ -186,7 +198,7 @@ public class GameManager : MonoBehaviour {
                     break;
                 case PendingActions.GameComplete:
                     KillNetwork();
-                    FloorText.text = "RITUAL COMPLETE";
+                    FloorText.text = "RITUAL\nCOMPLETE";
                     Invoke("InitMainMenu", 3);
                     
                     break;

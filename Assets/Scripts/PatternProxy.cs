@@ -203,7 +203,7 @@ public class PatternProxy : MonoBehaviour {
                 CreatePattern(_patternModel);
             }
 
-            AdjustCollidersSize();
+            //AdjustCollidersSize();
             _patternNedsUpdate = false;
         }
 

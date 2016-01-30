@@ -32,7 +32,7 @@ public class Segment : MonoBehaviour {
 
     internal Color _splashcolor;
 
-    private Color _offColor = new Color(0.3f, 0.3f, 0.3f);
+    private Color _offColor = new Color(0.3f, 0.3f, 0.3f, 0);
     internal bool IsWorking;
 
     internal void Init(int numOPlayers, float lifetime) {
