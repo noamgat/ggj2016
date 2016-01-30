@@ -30,6 +30,8 @@ public class Segment : MonoBehaviour {
     public float _InitialWave = 0;
     private Tweener _waveTweenr;
 
+    internal Color _splashcolor;
+
     private Color _offColor = new Color(0.3f, 0.3f, 0.3f);
     internal bool IsWorking;
 
@@ -66,7 +68,13 @@ public class Segment : MonoBehaviour {
         _waveTweenr =  HOTween.To(this, 0.2f, new TweenParms().Prop("_InitialWave", 1).Loops(2, LoopType.Yoyo));
     }
 
-    public void Splash(float timing) {
+    public void Splash(float timing, Color splashcolor) {
+
+        _splashcolor = splashcolor;
+
+        for (int i = 0; i < playerIndexes.Length; i++) {
+            playerIndexes[i] = 0;
+        }
         if (_waveTweenr != null) _waveTweenr.Kill();
         _waveTweenr = HOTween.To(this, 0.4f, new TweenParms().Prop("_InitialWave", 1).Loops(2, LoopType.Yoyo).Delay(0.1f + timing * 0.45f).Ease(EaseType.EaseOutSine));
 //        print(timing);
@@ -122,7 +130,7 @@ public class Segment : MonoBehaviour {
             }
 
         } else {
-            targetColor = Color.white;
+            targetColor = _splashcolor;
         }
         
 

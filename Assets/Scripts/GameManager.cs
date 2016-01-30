@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour {
     public Button StartButton;
     public Text CountText;
 
+    public Text FloorText;
+
     private int _numPlayers;
 	private int _numLevelsWon = 0;
 
@@ -138,9 +140,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void PlayStartAnim() {
-        CamAnimator.SetTrigger("StartIntro");
-        TempleAnimator.SetTrigger("StartIntro");
-        MainMenuUI.SetActive(false);
+        
         _networkClient.RequestStartGame();
     }
 
@@ -155,7 +155,9 @@ public class GameManager : MonoBehaviour {
             switch (_pendingActions) {
                 case PendingActions.StartGame:
                     MainMenuUI.SetActive(false);
-                    
+                    CamAnimator.SetTrigger("StartIntro");
+                    TempleAnimator.SetTrigger("StartIntro");
+                    FloorText.text = "";
                     break;
                 case PendingActions.StartRound:
 
@@ -164,7 +166,7 @@ public class GameManager : MonoBehaviour {
                     CamAnimator.SetTrigger("StartLevel");
 
                     PatternProxyInst.StartRound();
-
+                    FloorText.text = "Engrave";
                     
                     break;
 				case PendingActions.PlayWin:
@@ -172,16 +174,19 @@ public class GameManager : MonoBehaviour {
 					SoundManager.Instance.PlayLevelWinClip (_numLevelsWon);
                     Invoke("StartRound", 3);
                     PatternProxyInst.EndRound(true);
+
+                    FloorText.text = "DARKNESS!";
+
                     break;
 				case PendingActions.PlayLoose:
 					SoundManager.Instance.PlayLevelLoseClip ();
                     Invoke("InitMainMenu", 3);
-                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!lose");
                     PatternProxyInst.EndRound(false);
+                    FloorText.text = "You are weak";
                     break;
                 case PendingActions.GameComplete:
                     KillNetwork();
-                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!coplete");
+                    FloorText.text = "RITUAL COMPLETE";
                     Invoke("InitMainMenu", 3);
                     
                     break;

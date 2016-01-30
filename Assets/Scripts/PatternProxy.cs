@@ -41,7 +41,7 @@ public class PatternProxy : MonoBehaviour {
 
     internal void StartRound() {
         _isInGame = true;
-        ShowInitialSplash();
+        ShowInitialSplash(Color.white);
 
         ProgBar.fillAmount = 1;
         if (_barTween != null) _barTween.Kill();
@@ -51,6 +51,7 @@ public class PatternProxy : MonoBehaviour {
 
     internal void EndRound(bool win) {
         _isInGame = false;
+        ShowInitialSplash((win)? Color.green: Color.red);
     }
         
 
@@ -215,9 +216,9 @@ public class PatternProxy : MonoBehaviour {
         
     }
 
-    private void ShowInitialSplash() {
+    private void ShowInitialSplash(Color splashColor) {
         foreach (Segment seg in _segments) {
-            seg.Splash(0.5f * (seg.VertexA.location.y + seg.VertexB.location.y));
+            seg.Splash(0.5f * (seg.VertexA.location.y + seg.VertexB.location.y), splashColor);
         }
     }
 
