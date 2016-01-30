@@ -15,34 +15,98 @@ public class GameManager : MonoBehaviour {
 
     public PatternProxy PatternProxyInst;
 
+    private IGameClient _networkClient;
+
+    public bool UseFakeNetworClient;
+
+    private bool _pendingMainThreadAction = false;
+
     // Use this for initialization
     void Start () {
         // 
         IngameUI.SetActive(false);
         MainMenuUI.SetActive(true);
+
+
+        if (UseFakeNetworClient) {
+            _networkClient = new LocalGameClient();
+        } else {
+            _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
+        }
+
+
+        _networkClient.onConnected += ServerConnected;
+        _networkClient.onLevelStarted += ServerLevelStarted;
+        _networkClient.onEdgeFilled += EdgeFilledByPlayer;
+        _networkClient.onLevelWon += ServerLevelWon;
+        _networkClient.onClientError += ServerHadError;
+        _networkClient.onGameCompleted += ServerCompletedGame;
+        _networkClient.onLevelLost += ServerLostLevel;
+        _networkClient.onNumberOfPlayersChanged += ServerNumberOfPlayersChanged;
+
+        _networkClient.Connect();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    private void ServerConnected(int myID) {
+        PatternProxyInst.myID = myID;
+    }
+
+    void ServerNumberOfPlayersChanged(int obj) {
 
     }
 
-    // Start game - Look for a new game and start
-    public void InitiateConnection ()
-    {
-        // Display a connecting messaGE
-        //Text statusText = GameObject.Find("StatusText").GetComponent<Text>();
-        //statusText.text = "Forming a pact...";
+    private void ServerLevelStarted(PatternModel patternModel) {
+        PatternProxyInst.UpdatePattern(patternModel);
 
-        // Start the game 
-        IngameUI.SetActive(true);
+        _pendingMainThreadAction = true;
+
+       
+    }
+
+    private void ServerLevelWon() {
+        print("Won");
+    }
+
+    void ServerLostLevel() {
+
+    }
+
+    void ServerCompletedGame() {
+
+    }
+
+    void ServerHadError(string obj) {
+
+    }
+
+    internal void EdgeFilledByPlayer(int playerID, int edgeId) {
+        PatternProxyInst.EdgeFilledByPlayer(playerID, edgeId);
+
+    }
+
+    internal void NotifyFilledEdge(int edgeIndex) {
+        _networkClient.NotifyFilledEdge(edgeIndex);
+    }
+
+    public void SendRequestToStart(){
+        _networkClient.RequestStartGame();
         MainMenuUI.SetActive(false);
-        // Ease in the camera 
-        HOTween.To(cam.transform, 1, new TweenParms().Prop("localPosition", new Vector3(0.5f, -0.95f, -1.4f)).Prop("localRotation", Quaternion.Euler(316, 0 , 0)).Ease(EaseType.EaseOutQuint));
-
-        PatternProxyInst.StartGame();
     }
-    
 
+    void Update() {
+        if (_pendingMainThreadAction) {
+            // Start the game 
+            IngameUI.SetActive(true);
+
+            // Ease in the camera 
+            HOTween.To(cam.transform, 1, new TweenParms().Prop("localPosition", new Vector3(0.5f, -0.95f, -1.4f)).Prop("localRotation", Quaternion.Euler(316, 0, 0)).Ease(EaseType.EaseOutQuint));
+
+            PatternProxyInst.StartGame();
+
+
+            _pendingMainThreadAction = false;
+        }
+    }
+
+   
 }

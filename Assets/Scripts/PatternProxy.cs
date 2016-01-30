@@ -19,96 +19,38 @@ public class PatternProxy : MonoBehaviour {
 
     private Vertex _lastContact;
 
-    internal int _myID;
+    internal int myID;
 
     public float SegmentLifetime;
     public List<int> Players;
-
-    //private IGameClient _networkClient = new LocalGameClient();
-    //private IGameClient _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
-    private IGameClient _networkClient;
-
-    private bool _patternNedsUpdate = false;
-    private PatternModel _patternModel;
-
-    public bool UseLocal;
-
-    private bool _isInGame = false;
     
 
+    internal bool _patternNedsUpdate = false;
+    internal PatternModel _patternModel;
+    
+    private bool _isInGame = false;
 
+    public GameManager GameManagerInst;
 
-    // Use this for initialization
-    void Start () {
-
-        if (UseLocal) {
-            _networkClient = new LocalGameClient();
-        } else {
-            _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
-        }
-        
-
-		_networkClient.onConnected += ServerConnected;
-		_networkClient.onLevelStarted += ServerLevelStarted;
-        _networkClient.onEdgeFilled += EdgeFilledByPlayer;
-        _networkClient.onLevelWon += LevelWon;
-		_networkClient.onClientError += ServerHadError;
-		_networkClient.onGameCompleted += ServerCompletedGame;
-		_networkClient.onLevelLost += ServerLostLevel;
-		_networkClient.onNumberOfPlayersChanged += ServerNumberOfPlayersChanged;
-
-        _networkClient.Connect();
-    }
-
-    void ServerNumberOfPlayersChanged (int obj)
-    {
-		
-    }
-
-    void ServerLostLevel ()
-    {
-		
-    }
-
-    void ServerCompletedGame ()
-    {
-		
-    }
-
-    void ServerHadError (string obj)
-    {
-		
-    }
+    public bool useFakePattern;
 
     internal void StartGame() {
         _isInGame = true;
         ShowInitialSplash();
     }
-    
-    private void LevelWon() {
-        print("Won");
-    }
 
-    private void EdgeFilledByPlayer(int playerID, int edgeId) {
-        if (playerID != _myID) {
+
+
+    internal void EdgeFilledByPlayer(int playerID, int edgeId) {
+        if (playerID != myID) {
             _segments[edgeId].AddPlayer(Players.IndexOf(playerID));
         }
         
     }
 
-    private void ServerConnected(int myID) {
-        _myID = myID;
-        
-        _patternModel = patternModel;
-        _patternNedsUpdate = true;
+   
 
-    }
-
-	private void ServerLevelStarted(PatternModel patternModel) {
-		_serverStatuses = ServerStatuses.Ready;
-		_patternModel = patternModel;
-
-	}
+	
 
     private void AdjustCollidersSize() {
         foreach (Vertex verA in _verteces) {
@@ -142,7 +84,12 @@ public class PatternProxy : MonoBehaviour {
             seg.Place();
         }
     }
-    
+
+    internal void UpdatePattern(PatternModel patternModel) {
+        _patternModel = patternModel;
+        _patternNedsUpdate = true;
+    }
+
     public void CreatePattern() {
 
         //stub place
@@ -209,9 +156,9 @@ public class PatternProxy : MonoBehaviour {
 
             foreach (Segment seg in _segments) {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
-                    seg.AddPlayer(Players.IndexOf(_myID));
+                    seg.AddPlayer(Players.IndexOf(myID));
                     //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
-                    _networkClient.NotifyFilledEdge(_segments.IndexOf(seg));
+                    GameManagerInst.NotifyFilledEdge(_segments.IndexOf(seg));
                 }
             }
 
@@ -236,8 +183,12 @@ public class PatternProxy : MonoBehaviour {
 
             _verteces.Clear();
 
-            //CreatePattern(_patternModel);
-            CreatePattern();
+            if (useFakePattern) {
+                CreatePattern();
+            }else {
+                CreatePattern(_patternModel);
+            }
+
             AdjustCollidersSize();
             _patternNedsUpdate = false;
         }

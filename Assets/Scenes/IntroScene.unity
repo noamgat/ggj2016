@@ -161,7 +161,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1504003148}
-        m_MethodName: InitiateConnection
+        m_MethodName: SendRequestToStart
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -505,7 +505,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &548694688
 Transform:
   m_ObjectHideFlags: 0
@@ -880,6 +880,64 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1001 &1030600195
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.523
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: .801999986
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -1.15202326e-07
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -.707106709
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: .707106829
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -1.15202312e-07
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 9500000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: ba46111e533201a438a6cd5e6650be07, type: 2}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: .800000012
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: .800000012
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: .800000012
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: af28cf959a08aa84eba32f25210a067d, type: 3}
+  m_IsPrefabParent: 0
 --- !u!1 &1081868165
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,7 +1063,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -1037,7 +1095,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1385286515}
   m_LocalRotation: {x: -.65049684, y: 0, z: 0, w: .759509027}
-  m_LocalPosition: {x: .5, y: -3.33999991, z: -1.12}
+  m_LocalPosition: {x: .5, y: -3.45000005, z: -.430000007}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1069,7 +1127,7 @@ MonoBehaviour:
   VertexPF: {fileID: 11445004, guid: c08d7d8850b0d7344b60a0aeae69f5d2, type: 2}
   SegmentLifetime: 2
   Players: 01000000020000000300000004000000
-  UseLocal: 0
+  GameManagerInst: {fileID: 1504003148}
 --- !u!1 &1437896784
 GameObject:
   m_ObjectHideFlags: 0
@@ -1319,6 +1377,7 @@ MonoBehaviour:
   IngameUI: {fileID: 831633727}
   cam: {fileID: 1385286519}
   PatternProxyInst: {fileID: 1385286521}
+  UseFakeNetworClient: 0
 --- !u!4 &1504003149
 Transform:
   m_ObjectHideFlags: 0
