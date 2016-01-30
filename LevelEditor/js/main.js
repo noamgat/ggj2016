@@ -7,17 +7,16 @@ h = $(canvas).height();
 // unity project 
 ctx.transform(1, 0, 0, -1, 0, canvas.height);
 
-// Current selected tool
+// Current selected tool and settings 
 var tool = "line"; 
 var drawing = false; 
 var preview = {start: [0, 0], end: [0, 0]}
-// Current loaded map
-var points = [];
-var edges  = [];
-
 pointSize = 4; 
 gridSize = 0.05;
 snapping = true;
+// Current loaded map
+var points = [];
+var edges  = [];
 
 // Tool selection
 $(".editor-tools button").on("click", function(e) {
@@ -27,7 +26,7 @@ $(".editor-tools button").on("click", function(e) {
 	tool = $target.attr("data-tool");
 })
 $("#snapping-btn").on("click", function(e) {
-	if (snapping){ 
+	if (snapping) { 
 		snapping = false;
 		$("#snapping-btn").removeClass("btn-danger active");
 	} else {
