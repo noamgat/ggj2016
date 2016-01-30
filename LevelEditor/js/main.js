@@ -17,6 +17,7 @@ var edges  = [[0,1], [1,2], [2,3]];
 
 pointSize = 4; 
 gridSize = 0.05;
+snapping = true;
 
 // Tool selection
 $(".editor-tools button").on("click", function(e) {
@@ -24,6 +25,15 @@ $(".editor-tools button").on("click", function(e) {
 	$target = $(e.currentTarget);
 	$target.addClass("active");
 	tool = $target.attr("data-tool");
+})
+$("#snapping-btn").on("click", function(e) {
+	if (snapping){ 
+		snapping = false;
+		$("#snapping-btn").removeClass("btn-danger active");
+	} else {
+		snapping = true
+		$("#snapping-btn").addClass("btn-danger active");
+	}
 })
 // Modal opening
 $("#export-btn").on("click", function(e) {
@@ -87,7 +97,7 @@ draw = function(e) {
 	render();
 }
 updatePreview = function(type, x, y) {
-	if (tool == "line" || tool == "circle") {
+	if (snapping && (tool == "line" || tool == "circle")) {
 		x = numberToGrid(x);
 		y = numberToGrid(y);
 	}
