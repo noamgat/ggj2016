@@ -17,6 +17,8 @@ snapping = true;
 // Current loaded map
 var points = [];
 var edges  = [];
+// Let's allow for undo history, totally for ggj scope
+var stepHistory = [ {points:[], edges:[]} ];
 
 // Tool selection
 $(".editor-tools button").on("click", function(e) {
@@ -52,8 +54,7 @@ $('#import-modal .btn-primary').on("click", function(e) {
     } catch (e) {
         return alert("error parsing data goldy!");
     }
-    points = data.points; 
-    edges = data.edges;
+    loadLevel(data)
     render();
 }) 
 // Load image by url
@@ -81,7 +82,6 @@ stopDrawing = function(e) {
 	drawing = false; 
 	$(canvas).off("mousemove", draw);
 	
-	//
 	if (e.offsetX) {
 		updatePreview("end", e.offsetX, e.offsetY);
 		addShape();
@@ -137,11 +137,11 @@ $(document).on("mouseup", function(e) {
 addShape_line = function() {
 	distX = preview.end[0] - preview.start[0];
 	distY = preview.end[1] - preview.start[1];
-	steps = Math.abs(distX) * (w * gridSize) + Math.abs(distY)  * (w * gridSize);
+	steps = Math.round(distance(preview.start, preview.end) / gridSize);
 	
 	stepX = distX / steps;
 	stepY = distY / steps;
-		
+
 	for (i = 0; i <= steps; i++) {
 		coordinates = [
 			preview.start[0] + stepX * i,
@@ -149,7 +149,6 @@ addShape_line = function() {
 			];
 		points.push(coordinates);
 	}
-
 }
 addShape_circle = function() {
 	a = generateCirlce(preview.start, preview.end);
@@ -160,6 +159,9 @@ addShape_circle = function() {
 addShape_free = function() {}
 addShape_remove = function() {}
 addShape = function() {
+	// Save current step
+	addHistoryStep();
+
 	// Save the current amount of points, as we use it to connect the new generated
 	// points later
 	points_length = points.length;
@@ -175,6 +177,7 @@ addShape = function() {
 		edges.push([points_length, points.length-1]);
 	
 	render();
+
 }
 
 // Draw on canvas utils
@@ -273,12 +276,31 @@ render = function() {
 		drawLine(
 			[points[edges[i][0]][0], points[edges[i][0]][1]],
 			[points[edges[i][1]][0], points[edges[i][1]][1]],
-			"red"
+			"yellow"
 		);
 	}
 	// Render preview 
 	if (drawing)
 		window["renderPreview_" + tool]()
+}
+
+loadLevel = function (data) {
+    points = data.points; 
+    edges = data.edges;
+}
+
+addHistoryStep = function() {
+	data = {points: points.concat(), edges: edges.concat()}
+	stepHistory.push(data);
+}
+
+undo = function () {
+	if (!stepHistory.length)
+		return ;
+	data = stepHistory.pop();
+	points = data.points;
+	edges = data.edges;
+	render();
 }
 
 distance = function (p1, p2) {
