@@ -42,12 +42,8 @@ stopDrawing = function(cancel) {
 	drawing = false; 
 	$(canvas).off("mousemove", draw);
 	//
-	if (!cancel) {
-		//console.log("confirmed");
+	if (!cancel) 
 		addShape();
-	} else {
-		//console.log("cancelled");
-	}
 	render();
 }
 cancelDrawing = function () {
@@ -93,9 +89,42 @@ $(document).on("mouseup", function(e) {
 		cancelDrawing();
 });
 
-// ...
-addShape = function() {
+
+
+// Addition of the currently drawn shape into the list
+// Shapes are independent of the grid on purpose
+addShape_line = function() {
+	distX = preview.end[0] - preview.start[0];
+	distY = preview.end[1] - preview.start[1];
+	steps = Math.abs(distX) * (w * gridSize) + Math.abs(distY)  * (w * gridSize);
+	stepX = distX / steps;
+	stepY = distY / steps;
 	
+	points_connected = points.length;
+	
+	for (i = 0; i < steps; i++) {
+		coordinates = [
+			preview.start[0] + stepX * i,
+			preview.start[1] + stepY * i
+			];
+		points.push(coordinates);
+	}
+
+	// -1 
+	for (i = points_connected; i < points.length - 1; i++) {
+		edges.push([i, i+1])
+	}
+}
+addShape_circle = function() {
+
+}
+addShape_free = function() {
+}
+addShape_remove = function() {
+}
+addShape = function() {
+	window["addShape_" + tool]();
+	render();
 }
 
 // p1 = [x,y], p2 = [x, y]
