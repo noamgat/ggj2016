@@ -4,14 +4,31 @@
    Author's custom styles
    ========================================================================== */
 
-#canvas {
-	background-color: #888;
-	border: 1px solid black;
-}
-
-.editor-tools {
+.editor-tools, .file-tools {
 	margin-top: 8px;
 }
+
+.canvas-container {
+	width: 500px;
+	height: 500px;
+	position: relative;
+}
+
+.canvas-container img {
+	width: 120%;
+	height: 120%;
+	left: -10%;
+	top: -10%;
+	position: absolute;
+	opacity: 0.8;
+	z-index: 1;
+}
+.canvas-container #canvas {
+	border: 1px solid black;
+	z-index: 2;
+	position: relative;
+}
+
 
 
 
