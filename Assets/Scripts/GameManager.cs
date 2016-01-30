@@ -50,7 +50,8 @@ public class GameManager : MonoBehaviour {
     }
 
     private void InitMainMenu() {
-        
+
+        PatternProxyInst.Stopcandles();
 
         if (UseFakeNetworClient) {
             _networkClient = new LocalGameClient();

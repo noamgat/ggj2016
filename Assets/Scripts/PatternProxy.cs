@@ -37,7 +37,7 @@ public class PatternProxy : MonoBehaviour {
 
     public bool useFakePattern;
 
-    public List<ParticleSystem> Candles;
+    public Candle[] Candles;
 
     private Tweener _barTween;
 
@@ -67,8 +67,7 @@ public class PatternProxy : MonoBehaviour {
     }
 
    
-
-	
+    
 
     private void AdjustCollidersSize() {
         foreach (Vertex verA in _verteces) {
@@ -262,17 +261,22 @@ public class PatternProxy : MonoBehaviour {
 
     }
 
-    public void StartAnimationEnded() {
-        for (int i = 0; i < Candles.Count; i++) {
-            Invoke("LightSingleCandle", 0.08f * i);
+    public void Stopcandles() {
+        
+        for (int i = 0; i < Candles.Length; i++) {
+            Candles[i].Stop();
 
         }
     }
 
-    private void LightSingleCandle() {
-        Candles[0].Play();
-        Candles.RemoveAt(0);
+
+    public void StartAnimationEnded() {
+        for (int i = 0; i < Candles.Length; i++) {
+            Candles[i].Lightdelay(0.08f * i);
+            
+        }
     }
+   
 
     public void StartAnimComplete() {
         GameManagerInst.StartRound();
