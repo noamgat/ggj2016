@@ -8,14 +8,12 @@ h = $(canvas).height();
 ctx.transform(1, 0, 0, -1, 0, canvas.height);
 
 // Current selected tool
-var tool = "circle"; 
+var tool = "line"; 
 var drawing = false; 
 var preview = {start: [0, 0], end: [0, 0]}
 // Current loaded map
 var points = [];
-	//[[0, 0], [0.2, 0.2], [0.5, 0.5], [0.5, 0.8]];
-var edges = [];
-	//[[0, 1], [1, 3]];
+var edges  = [];
 
 pointSize = 4; 
 gridSize = 0.05;
@@ -49,10 +47,21 @@ $('#import-modal .btn-primary').on("click", function(e) {
     edges = data.edges;
     render();
 }) 
-
-
-
-
+// Load image by url
+$("#load-image-btn").on("click", function(e) {
+	$('#load-image-modal').modal('show');
+})
+$("#load-image-modal .btn-primary").on("click", function(e) {
+	url = $('#load-image-modal input').val();
+	// Leave blank to hide the image. 
+	if (!url) {
+		$(".canvas-container img").hide();
+	} else {
+		$(".canvas-container img").attr('src', url);
+		$(".canvas-container img").show();
+	}
+	$('#load-image-modal').modal('hide');
+})
 
 startDrawing = function(e) {
 	drawing = true; 
@@ -115,7 +124,6 @@ $(document).on("mouseup", function(e) {
 // Addition of the currently drawn shape into the list
 // Shapes are independent of the grid on purpose
 addShape_line = function() {
-	// fix syteps...
 	distX = preview.end[0] - preview.start[0];
 	distY = preview.end[1] - preview.start[1];
 	steps = Math.abs(distX) * (w * gridSize) + Math.abs(distY)  * (w * gridSize);
@@ -123,7 +131,7 @@ addShape_line = function() {
 	stepX = distX / steps;
 	stepY = distY / steps;
 		
-	for (i = 0; i < steps; i++) {
+	for (i = 0; i <= steps; i++) {
 		coordinates = [
 			preview.start[0] + stepX * i,
 			preview.start[1] + stepY * i
@@ -138,10 +146,8 @@ addShape_circle = function() {
 		points.push(a[i]);
 	}
 }
-addShape_free = function() {
-}
-addShape_remove = function() {
-}
+addShape_free = function() {}
+addShape_remove = function() {}
 addShape = function() {
 	// Save the current amount of points, as we use it to connect the new generated
 	// points later
@@ -156,7 +162,6 @@ addShape = function() {
 	// Connect the first and last points if it's a circle. 
 	if (tool == "circle") 
 		edges.push([points_length, points.length-1]);
-	
 	
 	render();
 }
@@ -179,7 +184,7 @@ generateCirlce = function(p1, p2) {
 	centerX = (p1[0] + p2[0]) / 2; 
 	centerY = (p1[1] + p2[1]) / 2;
 
-	dist = Math.sqrt( (p1[0]-p2[0]) * (p1[0]-p2[0]) + (p1[1]-p1[1]) * (p1[1]-p1[1]) );
+	dist = distance(p1, p2);;
 	step = (1 - dist) / 2;
 
 	radx = (p1[1] - p2[1]) / 2;
@@ -245,4 +250,8 @@ render = function() {
 	if (drawing)
 		window["renderPreview_" + tool]()
 }
-loadLevel();
+
+distance = function (p1, p2) {
+	return Math.sqrt( (p1[0]-p2[0]) * (p1[0]-p2[0]) + (p1[1]-p1[1]) * (p1[1]-p1[1]) );
+}
+
