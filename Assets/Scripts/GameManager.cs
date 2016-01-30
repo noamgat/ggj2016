@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour {
     public Text CountText;
 
     private int _numPlayers;
+	private int _numLevelsWon = 0;
 
     // Use this for initialization
     void Start () {
@@ -94,22 +95,24 @@ public class GameManager : MonoBehaviour {
 
     private void ServerLevelStarted(PatternModel patternModel) {
         PatternProxyInst.UpdatePattern(patternModel);
-
         _pendingMainThreadAction = true;
         _pendingActions = PendingActions.StartRound;
   
     }
 
+
     private void ServerGameStarted() {
         _pendingMainThreadAction = true;
         _pendingActions = PendingActions.StartGame;
+		_numLevelsWon = 0;
     }
+
 
 
     private void ServerLevelWon() {
         _pendingActions = PendingActions.PlayWin;
         _pendingMainThreadAction = true;
-        
+		_numLevelsWon++;
     }
 
     void ServerLostLevel() {
@@ -158,19 +161,21 @@ public class GameManager : MonoBehaviour {
                 case PendingActions.StartRound:
 
                     IngameUI.SetActive(true);
-
+					SoundManager.Instance.PlayBackgroundMusic ();
                     CamAnimator.SetTrigger("StartLevel");
 
                     PatternProxyInst.StartRound();
 
                     _pendingMainThreadAction = false;
                     break;
-                case PendingActions.PlayWin:
-                    IngameUI.SetActive(false);
+				case PendingActions.PlayWin:
+					IngameUI.SetActive (false);
+					SoundManager.Instance.PlayLevelWinClip (_numLevelsWon);
                     Invoke("StartRound", 3);
                     PatternProxyInst.EndRound(true);
                     break;
-                case PendingActions.PlayLoose:
+				case PendingActions.PlayLoose:
+					SoundManager.Instance.PlayLevelLoseClip ();
                     Invoke("InitMainMenu", 3);
                     PatternProxyInst.EndRound(false);
                     break;
