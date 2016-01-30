@@ -39,17 +39,20 @@ public class PatternProxy : MonoBehaviour {
 
     private Tweener _barTween;
 
-    internal void StartGame() {
+    internal void StartRound() {
         _isInGame = true;
         ShowInitialSplash();
 
         ProgBar.fillAmount = 1;
         if (_barTween != null) _barTween.Kill();
 
-        _barTween = HOTween.To(ProgBar, 10, new TweenParms().Prop("fillAmount", 0).Ease(EaseType.Linear));
+        _barTween = HOTween.To(ProgBar, 30, new TweenParms().Prop("fillAmount", 0).Ease(EaseType.Linear));
     }
 
-
+    internal void EndRound(bool win) {
+        _isInGame = false;
+    }
+        
 
     internal void EdgeFilledByPlayer(int playerID, int edgeId) {
         if (playerID != myID) {
@@ -255,6 +258,6 @@ public class PatternProxy : MonoBehaviour {
     }
 
     public void StartAnimComplete() {
-        GameManagerInst.StartAnimComplete();
+        GameManagerInst.StartRound();
     }
 }

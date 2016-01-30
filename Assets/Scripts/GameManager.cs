@@ -12,7 +12,10 @@ public class GameManager : MonoBehaviour {
 
     // Current game state
     private enum States { Menu, Connecting, Ingame, Loss, Win }
+    private enum PendingActions{ StartGame, StartRound, PlayWin, PlayLoose, GameComplete };
     private States _state;
+
+    private PendingActions _pendingActions;
 
     public PatternProxy PatternProxyInst;
 
@@ -32,9 +35,28 @@ public class GameManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        // 
-        IngameUI.SetActive(false);
-        MainMenuUI.SetActive(true);
+        
+        
+        
+
+        InitMainMenu();
+    }
+
+    private void InitMainMenu() {
+
+        if (_networkClient != null) {
+            _networkClient.onConnected -= ServerConnected;
+            _networkClient.onLevelStarted -= ServerLevelStarted;
+            _networkClient.onGameStarted -= ServerGameStarted;
+            _networkClient.onEdgeFilled -= EdgeFilledByPlayer;
+            _networkClient.onLevelWon -= ServerLevelWon;
+            _networkClient.onClientError -= ServerHadError;
+            _networkClient.onGameCompleted -= ServerCompletedGame;
+            _networkClient.onLevelLost -= ServerLostLevel;
+            _networkClient.onNumberOfPlayersChanged -= ServerNumberOfPlayersChanged;
+
+            (_networkClient as GameClient).Dispose();
+        }
 
 
         if (UseFakeNetworClient) {
@@ -46,6 +68,7 @@ public class GameManager : MonoBehaviour {
 
         _networkClient.onConnected += ServerConnected;
         _networkClient.onLevelStarted += ServerLevelStarted;
+        _networkClient.onGameStarted += ServerGameStarted;
         _networkClient.onEdgeFilled += EdgeFilledByPlayer;
         _networkClient.onLevelWon += ServerLevelWon;
         _networkClient.onClientError += ServerHadError;
@@ -54,7 +77,11 @@ public class GameManager : MonoBehaviour {
         _networkClient.onNumberOfPlayersChanged += ServerNumberOfPlayersChanged;
 
         _networkClient.Connect();
+
+        IngameUI.SetActive(false);
+        MainMenuUI.SetActive(true);
     }
+
 
     private void ServerConnected(int myID) {
         PatternProxyInst.myID = myID;
@@ -69,20 +96,30 @@ public class GameManager : MonoBehaviour {
         PatternProxyInst.UpdatePattern(patternModel);
 
         _pendingMainThreadAction = true;
-
-       
+        _pendingActions = PendingActions.StartRound;
+  
     }
 
+    private void ServerGameStarted() {
+        _pendingMainThreadAction = true;
+        _pendingActions = PendingActions.StartGame;
+    }
+
+
     private void ServerLevelWon() {
-        print("Won");
+        _pendingActions = PendingActions.PlayWin;
+        _pendingMainThreadAction = true;
+        
     }
 
     void ServerLostLevel() {
-
+        _pendingMainThreadAction = true;
+        _pendingActions = PendingActions.PlayLoose;
     }
 
     void ServerCompletedGame() {
-
+        _pendingActions = PendingActions.GameComplete;
+        _pendingMainThreadAction = true;
     }
 
     void ServerHadError(string obj) {
@@ -100,25 +137,47 @@ public class GameManager : MonoBehaviour {
 
     public void PlayStartAnim() {
         MainMenuUI.SetActive(false);
-        CamAnimator.SetTrigger("StartIntro");
-        TempleAnimator.SetTrigger("StartIntro");
+        _networkClient.RequestStartGame();
     }
 
-    internal void StartAnimComplete() {
-        _networkClient.RequestStartGame();
+    internal void StartRound() {
+        _networkClient.RequestStartLevel();
     }
     
 
     void Update() {
         if (_pendingMainThreadAction) {
 
-            IngameUI.SetActive(true);
-            
-            CamAnimator.SetTrigger("StartLevel");
-            
-            PatternProxyInst.StartGame();
-            
-            _pendingMainThreadAction = false;
+            switch (_pendingActions) {
+                case PendingActions.StartGame:
+                    MainMenuUI.SetActive(false);
+                    CamAnimator.SetTrigger("StartIntro");
+                    TempleAnimator.SetTrigger("StartIntro");
+                    break;
+                case PendingActions.StartRound:
+
+                    IngameUI.SetActive(true);
+
+                    CamAnimator.SetTrigger("StartLevel");
+
+                    PatternProxyInst.StartRound();
+
+                    _pendingMainThreadAction = false;
+                    break;
+                case PendingActions.PlayWin:
+                    IngameUI.SetActive(false);
+                    Invoke("StartRound", 3);
+                    PatternProxyInst.EndRound(true);
+                    break;
+                case PendingActions.PlayLoose:
+                    Invoke("InitMainMenu", 3);
+                    PatternProxyInst.EndRound(false);
+                    break;
+                case PendingActions.GameComplete:
+                    Invoke("InitMainMenu", 3);
+                    
+                    break;
+            }
         }
 
         StartButton.interactable = _numPlayers > 0;

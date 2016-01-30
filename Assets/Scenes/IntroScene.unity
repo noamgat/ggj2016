@@ -431,7 +431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &548694688
 Transform:
   m_ObjectHideFlags: 0
@@ -2012,8 +2012,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1081868165}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .5, y: .5, z: .00999999978}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+  m_LocalPosition: {x: .5, y: -.122000001, z: .00999999978}
+  m_LocalScale: {x: 1.88, y: 3.25, z: 1}
   m_Children: []
   m_Father: {fileID: 548694688}
   m_RootOrder: 0
@@ -2027,7 +2027,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 6c02608b5fdffbc4c81abe1875c1735a, type: 2}
+  - {fileID: 2100000, guid: a65dee28043fbff42861584d6e3fa64c, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
