@@ -8,7 +8,7 @@ h = $(canvas).height();
 ctx.transform(1, 0, 0, -1, 0, canvas.height);
 
 // Current selected tool
-var tool = "circle"; // to
+var tool = "circle"; 
 var drawing = false; 
 var preview = {start: [0, 0], end: [0, 0]}
 // Current loaded map
@@ -27,38 +27,63 @@ $(".editor-tools button").on("click", function(e) {
 	$target.addClass("active");
 	tool = $target.attr("data-tool");
 })
+// Modal opening
+$("#export-btn").on("click", function(e) {
+	$('#export-modal').modal('show');   
+	data = JSON.stringify({ points: points, edges: edges });
+	$('#export-modal textarea').val(data.toString());
+})
+$("#import-btn").on("click", function(e) {
+	$('#import-modal').modal('show');   
+})
+// Import
+$('#import-modal .btn-primary').on("click", function(e) {
+	content = $('#import-modal textarea').val();
+	$('#import-modal').modal('hide');  
+	try {
+		data = JSON.parse(content);
+    } catch (e) {
+        return alert("error parsing data goldy!");
+    }
+    points = data.points; 
+    edges = data.edges;
+    render();
+}) 
 
-// Canvas functionality
+
+
+
+
 startDrawing = function(e) {
 	drawing = true; 
-	x = numberToGrid(e.offsetX);
-	y = numberToGrid(e.offsetY);
-	preview.start = [
-		transformCanvasToUnityX(x), 
-		transformCanvasToUnityY(y)
-	]
+	updatePreview("start", e.offsetX, e.offsetY);
 	$(canvas).on("mousemove", draw);
 }
-stopDrawing = function(cancel) {
+stopDrawing = function(e) {
 	drawing = false; 
 	$(canvas).off("mousemove", draw);
+	
 	//
-	if (!cancel) 
+	if (e.offsetX) {
+		updatePreview("end", e.offsetX, e.offsetY);
 		addShape();
+	}
 	render();
 }
 cancelDrawing = function () {
-	stopDrawing(true);
+	stopDrawing(false);
 }
-// accepts e for mouse events 
 draw = function(e) {
-	x = numberToGrid(e.offsetX);
-	y = numberToGrid(e.offsetY);
-	preview.end = [
+	updatePreview("end", e.offsetX, e.offsetY);
+	render();
+}
+updatePreview = function(type, x, y) {
+	x = numberToGrid(x);
+	y = numberToGrid(y);
+	preview[type] = [
 		transformCanvasToUnityX(x), 
 		transformCanvasToUnityY(y)
 	]
-	render();
 }
 
 // Transform X canvas units into values from 0 to 1
@@ -79,10 +104,7 @@ numberToGrid = function (n) {
 // Press down
 $(canvas).on("mousedown", startDrawing);
 // Press up 
-$(canvas).on("mouseup", function(e) {
-	//console.log("up", e.offsetX, e.offsetY);
-	stopDrawing();
-});
+$(canvas).on("mouseup", stopDrawing);
 // Press up, outside of the canvas 
 $(document).on("mouseup", function(e) {
 	// Cancel the drawing if we release outside of the canvas
@@ -93,9 +115,11 @@ $(document).on("mouseup", function(e) {
 // Addition of the currently drawn shape into the list
 // Shapes are independent of the grid on purpose
 addShape_line = function() {
+	// fix syteps...
 	distX = preview.end[0] - preview.start[0];
 	distY = preview.end[1] - preview.start[1];
 	steps = Math.abs(distX) * (w * gridSize) + Math.abs(distY)  * (w * gridSize);
+	
 	stepX = distX / steps;
 	stepY = distY / steps;
 		
@@ -109,12 +133,10 @@ addShape_line = function() {
 
 }
 addShape_circle = function() {
-	console.log("adding")
 	a = generateCirlce(preview.start, preview.end);
 	for (i = 0; i < a.length; i++) {
 		points.push(a[i]);
 	}
-
 }
 addShape_free = function() {
 }
@@ -129,8 +151,12 @@ addShape = function() {
 	// Connect the points by generating edges between them. Dismiss the last point
 	// as it does not connect to anything. 
 	for (i = points_length; i < points.length - 1; i++) {
-		edges.push([i, i+1])
+		edges.push([i, i+1]);
 	}
+	// Connect the first and last points if it's a circle. 
+	if (tool == "circle") 
+		edges.push([points_length, points.length-1]);
+	
 	
 	render();
 }
@@ -160,7 +186,6 @@ generateCirlce = function(p1, p2) {
 	rady = (p1[0] - p2[0]) / 2;
 
 	arr = [];
-
 	for (var i = 0 * Math.PI; i < 2 * Math.PI; i += step ) {
 	    xPos = centerX - (radx * Math.sin(i)) * Math.sin(0 * Math.PI) + (rady * Math.cos(i)) * Math.cos(0 * Math.PI);
 	    yPos = centerY + (rady * Math.cos(i)) * Math.sin(0 * Math.PI) + (radx * Math.sin(i)) * Math.cos(0 * Math.PI);
@@ -221,9 +246,3 @@ render = function() {
 		window["renderPreview_" + tool]()
 }
 loadLevel();
-
-
-scaleToCanvas = function(s) {
-
-	return 
-}

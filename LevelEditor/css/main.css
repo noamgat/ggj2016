@@ -9,7 +9,7 @@
 	border: 1px solid black;
 }
 
-.editor-tools {
+.editor-tools, .file-tools {
 	margin-top: 8px;
 }
 
