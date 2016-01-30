@@ -22,8 +22,14 @@ public class GameClientWrapper : MonoBehaviour {
 		gameClient.onClientError += GameClient_onClientError;
 		gameClient.onLevelStarted += GameClient_onLevelStarted;
 		gameClient.onLevelLost += GameClient_onLevelLost;
+		gameClient.onGameCompleted += GameClient_onGameCompleted;
 		Debug.Log ("Calling load");
 		gameClient.Connect ();
+	}
+
+	void GameClient_onGameCompleted ()
+	{
+		Debug.Log ("Game completed");
 	}
 
 	void GameClient_onLevelLost ()
