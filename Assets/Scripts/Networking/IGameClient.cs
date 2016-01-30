@@ -9,15 +9,38 @@ public class PatternModel {
 
 public interface IGameClient
 {
-	//Load finished successfully
-	event System.Action<PatternModel, int> onLoaded;
+	//First call to connect to the server
+	void Connect();
+
+	//Successfully connected to server as PlayerID
+	event System.Action<int> onConnected;
+
+	//Could not connect or other problem (reason as string)
+	event System.Action<string> onClientError;
+
+	//The number of players changed
+	event System.Action<int> onNumberOfPlayersChanged;
+
+	//If the game has not started yet, request to start it
+	void RequestStartGame ();
+
+	//Level started (will be called for subsequent levels as well)
+	event System.Action<PatternModel> onLevelStarted;
+
+	//Tell the server that you filled an edge
+	void NotifyFilledEdge (int edgeID);
+
 	//PlayerID filled EdgeID
 	event System.Action<int, int> onEdgeFilled;
+
 	//Level won
 	event System.Action onLevelWon;
 
-	void NotifyFilledEdge (int edgeID);
-	void Load();
+	//Level lost
+	event System.Action onLevelLost;
+
+	//All the levels were completed
+	event System.Action onGameCompleted;
 }
 
 

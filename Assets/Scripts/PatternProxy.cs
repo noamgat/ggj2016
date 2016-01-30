@@ -2,11 +2,12 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PatternProxy : MonoBehaviour {
-
-    private enum ServerStatuses { Waiting, Ready, Initiated };
     
+    public Image ProgBar;
+
     public Vector2[] TargetPoints;
     public int[] TargetSegments;
 
@@ -18,54 +19,38 @@ public class PatternProxy : MonoBehaviour {
 
     private Vertex _lastContact;
 
-    internal int _myID;
+    internal int myID;
 
     public float SegmentLifetime;
     public List<int> Players;
+    
 
-    //private IGameClient _networkClient = new LocalGameClient();
-    //private IGameClient _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
-    private IGameClient _networkClient;
+    internal bool _patternNedsUpdate = false;
+    internal PatternModel _patternModel;
+    
+    private bool _isInGame = false;
 
-    private ServerStatuses _serverStatuses = ServerStatuses.Waiting;
-    private PatternModel _patternModel;
+    public GameManager GameManagerInst;
 
-    public bool UseLocal;
+    public bool useFakePattern;
 
-    // Use this for initialization
-    void Start () {
-
-        if (UseLocal) {
-            _networkClient = new LocalGameClient();
-        } else {
-            _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
-        }
-        
-
-        _networkClient.onLoaded += ServerLoaded;
-        _networkClient.onEdgeFilled += EdgeFilledByPlayer;
-        _networkClient.onLevelWon += LevelWon;
-
-        _networkClient.Load();
+    internal void StartGame() {
+        _isInGame = true;
+        ShowInitialSplash();
     }
 
-    private void LevelWon() {
-        print("Won");
-    }
 
-    private void EdgeFilledByPlayer(int playerID, int edgeId) {
-        if (playerID != _myID) {
+
+    internal void EdgeFilledByPlayer(int playerID, int edgeId) {
+        if (playerID != myID) {
             _segments[edgeId].AddPlayer(Players.IndexOf(playerID));
         }
         
     }
 
-    private void ServerLoaded(PatternModel patternModel, int myID) {
-        _myID = myID;
-        _serverStatuses = ServerStatuses.Ready;
-        _patternModel = patternModel;
-        
-    }
+   
+
+	
 
     private void AdjustCollidersSize() {
         foreach (Vertex verA in _verteces) {
@@ -99,7 +84,11 @@ public class PatternProxy : MonoBehaviour {
             seg.Place();
         }
     }
-    
+
+    internal void UpdatePattern(PatternModel patternModel) {
+        _patternModel = patternModel;
+        _patternNedsUpdate = true;
+    }
 
     public void CreatePattern() {
 
@@ -160,14 +149,16 @@ public class PatternProxy : MonoBehaviour {
     }
 
     internal void CheckCollision(Collider collider) {
+        if (!_isInGame) return;
+
         Vertex vertex = collider.GetComponent<Vertex>();
         if (vertex != null && _lastContact != vertex && _verteces.IndexOf(vertex) > -1) {
 
             foreach (Segment seg in _segments) {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
-                    seg.AddPlayer(Players.IndexOf(_myID));
+                    seg.AddPlayer(Players.IndexOf(myID));
                     //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
-                    _networkClient.NotifyFilledEdge(_segments.IndexOf(seg));
+                    GameManagerInst.NotifyFilledEdge(_segments.IndexOf(seg));
                 }
             }
 
@@ -177,16 +168,49 @@ public class PatternProxy : MonoBehaviour {
     }
 
     void Update() {
-        if (_serverStatuses == ServerStatuses.Ready) {
-            CreatePattern(_patternModel);
-            //CreatePattern();
+        if (_patternNedsUpdate) {
+
+            foreach(Segment seg in _segments) { 
+                Destroy(seg.gameObject);
+            }
+
+            _segments.Clear();
+
+
+            foreach (Vertex ver in _verteces) {
+                Destroy(ver.gameObject);
+            }
+
+            _verteces.Clear();
+
+            if (useFakePattern) {
+                CreatePattern();
+            }else {
+                CreatePattern(_patternModel);
+            }
+
             AdjustCollidersSize();
-            _serverStatuses = ServerStatuses.Initiated;
+            _patternNedsUpdate = false;
+        }
+
+        int workngSegments = 0;
+
+        foreach (Segment seg in _segments) {
+            if (seg.IsWorking) workngSegments++;
+        }
+        
+        
+        if (_segments.Count > 0) ProgBar.fillAmount = (float)workngSegments / _segments.Count;
+    }
+
+    private void ShowInitialSplash() {
+        foreach (Segment seg in _segments) {
+            seg.Splash(0.5f * (seg.VertexA.location.y + seg.VertexB.location.y));
         }
     }
 
-    public void GeneratePatternJSON() {
-
+    public void DebugAction() {
+        /*
         string s = "{\n";
         s += "\"points\": [\n";
         
@@ -204,6 +228,8 @@ public class PatternProxy : MonoBehaviour {
         s += "}\n";
 
         print( s);
+        */
+        _patternNedsUpdate = true;
 
     }
 }

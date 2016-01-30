@@ -22,8 +22,16 @@ public class Segment : MonoBehaviour {
     private Color _transColor = new Color(0, 0, 0, 0);
 
     private Material[] WallMat = new Material[2];
-
     public GameObject[] Walls;
+
+    public GameObject Floor;
+    private Material FloorMat;
+
+    public float _InitialWave = 0;
+    private Tweener _waveTweenr;
+
+    private Color _offColor = new Color(0.3f, 0.3f, 0.3f);
+    internal bool IsWorking;
 
     internal void Init(int numOPlayers, float lifetime) {
         _lifetime = lifetime;
@@ -37,6 +45,10 @@ public class Segment : MonoBehaviour {
 
         WallMat[0] = Walls[0].GetComponent<Renderer>().material;
         WallMat[1] = Walls[1].GetComponent<Renderer>().material;
+
+        FloorMat = Floor.GetComponent<Renderer>().material;
+
+        IsWorking = false;
     }
 
     public void Place() {
@@ -48,24 +60,21 @@ public class Segment : MonoBehaviour {
 
     public void AddPlayer(int playerIndex){
         playerIndexes[playerIndex] = 1;
-        /*get{
-            return _state;
-        }
-        set{
-            _state = value;
 
-            
+        if (_waveTweenr != null) _waveTweenr.Kill();
+        _InitialWave = 0;
+        _waveTweenr =  HOTween.To(this, 0.2f, new TweenParms().Prop("_InitialWave", 1).Loops(2, LoopType.Yoyo));
+    }
 
-            switch (value) {
-                case States.Idle: mat.color = Color.white; break;
-                case States.Player: mat.color = Color.green; break;
-                default : mat.color = Color.black; break;
-            }
-        }*/
+    public void Splash(float timing) {
+        if (_waveTweenr != null) _waveTweenr.Kill();
+        _waveTweenr = HOTween.To(this, 0.4f, new TweenParms().Prop("_InitialWave", 1).Loops(2, LoopType.Yoyo).Delay(0.1f + timing * 0.45f).Ease(EaseType.EaseOutSine));
+//        print(timing);
     }
 
 
-    // Use this for initialization
+
+        // Use this for initialization
     void Start () {
 
         WallMat[0].mainTexture = FireTextures[UnityEngine.Random.Range(0, FireTextures.Length)];
@@ -78,9 +87,7 @@ public class Segment : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
         
-
         float maxIntensity = 0;
         for (int i = 0; i < playerIndexes.Length; i++) {
             playerIndexes[i] -= Time.deltaTime / _lifetime;
@@ -88,37 +95,52 @@ public class Segment : MonoBehaviour {
         }
 
         //progress mix. go to next color if needed
-        _mixAmmount += Time.deltaTime * 4;
+        _mixAmmount += Time.deltaTime * 2;
         while (_mixAmmount > 1) {
             _mixAmmount -= 1;
             fromColor = (fromColor + 1) % playerIndexes.Length;
         }
 
-        if (maxIntensity > 0) {
+        IsWorking = maxIntensity > 0;
+        
+        Color targetColor;
+
+        if (IsWorking) {
             while (playerIndexes[fromColor] <= 0) {
                 fromColor = (fromColor + 1) % playerIndexes.Length;
             }
-        }
 
-        toColor = (fromColor + 1) % playerIndexes.Length;
-        while (playerIndexes[toColor] <= 0 && toColor != fromColor) {
-            toColor = (toColor + 1) % playerIndexes.Length;
-        }
+            toColor = (fromColor + 1) % playerIndexes.Length;
+            while (playerIndexes[toColor] <= 0 && toColor != fromColor) {
+                toColor = (toColor + 1) % playerIndexes.Length;
+            }
 
-        Color targetColor;
+            if (toColor != fromColor) {
+                targetColor = Color.Lerp(_colors[fromColor], _colors[toColor], _mixAmmount);
+            } else {
+                targetColor = _colors[fromColor];
+            }
 
-        if (toColor != fromColor) {
-            targetColor = Color.Lerp(_colors[fromColor], _colors[toColor], _mixAmmount);
         } else {
-            targetColor = _colors[fromColor];
+            targetColor = Color.white;
         }
+        
 
-        float visIntesity = Mathf.Min(1, maxIntensity * 4);
-
-        //targetColor = Color.Lerp(_transColor, targetColor, visIntesity);
+        float visIntesity = Mathf.Min(1, maxIntensity * 4 + _InitialWave);
+        
         targetColor.a = visIntesity;
         WallMat[0].color = targetColor;
         WallMat[1].color = targetColor;
+
+        float height = 0.3f * _InitialWave + 0.2f * visIntesity;
+
+        Walls[0].transform.localScale = new Vector3(1, height, 1);
+        Walls[0].transform.localPosition = new Vector3(0, height / 2, 0.5f);
+        Walls[1].transform.localScale = new Vector3(1, height, 1);
+        Walls[1].transform.localPosition = new Vector3(0, height / 2, 0.5f);
+
+        FloorMat.color = Color.Lerp(Color.Lerp(_offColor, Color.white, visIntesity), targetColor, 0.3f * visIntesity);
+
         
     }
 }
