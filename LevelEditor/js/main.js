@@ -8,12 +8,12 @@ h = $(canvas).height();
 ctx.transform(1, 0, 0, -1, 0, canvas.height);
 
 // Current selected tool
-var tool = "remove"; 
+var tool = "line"; 
 var drawing = false; 
 var preview = {start: [0, 0], end: [0, 0]}
 // Current loaded map
-var points = [[0.2, 0.2], [0.5, 0.5], [0.8, 0.8], [0.9, 0.9]];
-var edges  = [[0,1], [1,2], [2,3]];
+var points = [];
+var edges  = [];
 
 pointSize = 4; 
 gridSize = 0.05;
