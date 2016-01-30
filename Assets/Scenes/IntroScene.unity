@@ -6224,16 +6224,16 @@ MonoBehaviour:
   CountText: {fileID: 813818094}
   FloorText: {fileID: 2064242953}
   LevelTextures:
-  - {fileID: 2800000, guid: b1dddf03c8ae31946af747157cd95907, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
-  - {fileID: 2800000, guid: 6637bbcac07407f449da9a33550885c9, type: 3}
+  - {fileID: 2800000, guid: 93ff8f7bf068ee04594be8091abba88f, type: 3}
+  - {fileID: 2800000, guid: 93ff8f7bf068ee04594be8091abba88f, type: 3}
+  - {fileID: 2800000, guid: ed4e9cc1943588f4fa995c4fd802c80c, type: 3}
+  - {fileID: 2800000, guid: f13e7e5260228e94c92e321cbb9b83f3, type: 3}
+  - {fileID: 2800000, guid: dc9ff6890e44dd6459f58d6bc13d8a4f, type: 3}
+  - {fileID: 2800000, guid: dc9ff6890e44dd6459f58d6bc13d8a4f, type: 3}
+  - {fileID: 2800000, guid: dc9ff6890e44dd6459f58d6bc13d8a4f, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   LevelBackground: {fileID: 865744443}
 --- !u!4 &1504003149
 Transform:
