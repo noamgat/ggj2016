@@ -2,11 +2,12 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PatternProxy : MonoBehaviour {
-
-    private enum ServerStatuses { Waiting, Ready, Initiated };
     
+    public Image ProgBar;
+
     public Vector2[] TargetPoints;
     public int[] TargetSegments;
 
@@ -27,10 +28,15 @@ public class PatternProxy : MonoBehaviour {
     //private IGameClient _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
     private IGameClient _networkClient;
 
-    private ServerStatuses _serverStatuses = ServerStatuses.Waiting;
+    private bool _patternNedsUpdate = false;
     private PatternModel _patternModel;
 
     public bool UseLocal;
+
+    private bool _isInGame = false;
+    
+
+
 
     // Use this for initialization
     void Start () {
@@ -49,6 +55,11 @@ public class PatternProxy : MonoBehaviour {
         _networkClient.Load();
     }
 
+    internal void StartGame() {
+        _isInGame = true;
+        ShowInitialSplash();
+    }
+    
     private void LevelWon() {
         print("Won");
     }
@@ -62,9 +73,10 @@ public class PatternProxy : MonoBehaviour {
 
     private void ServerLoaded(PatternModel patternModel, int myID) {
         _myID = myID;
-        _serverStatuses = ServerStatuses.Ready;
-        _patternModel = patternModel;
         
+        _patternModel = patternModel;
+        _patternNedsUpdate = true;
+
     }
 
     private void AdjustCollidersSize() {
@@ -100,7 +112,6 @@ public class PatternProxy : MonoBehaviour {
         }
     }
     
-
     public void CreatePattern() {
 
         //stub place
@@ -160,6 +171,8 @@ public class PatternProxy : MonoBehaviour {
     }
 
     internal void CheckCollision(Collider collider) {
+        if (!_isInGame) return;
+
         Vertex vertex = collider.GetComponent<Vertex>();
         if (vertex != null && _lastContact != vertex && _verteces.IndexOf(vertex) > -1) {
 
@@ -177,16 +190,45 @@ public class PatternProxy : MonoBehaviour {
     }
 
     void Update() {
-        if (_serverStatuses == ServerStatuses.Ready) {
-            CreatePattern(_patternModel);
-            //CreatePattern();
+        if (_patternNedsUpdate) {
+
+            foreach(Segment seg in _segments) { 
+                Destroy(seg.gameObject);
+            }
+
+            _segments.Clear();
+
+
+            foreach (Vertex ver in _verteces) {
+                Destroy(ver.gameObject);
+            }
+
+            _verteces.Clear();
+
+            //CreatePattern(_patternModel);
+            CreatePattern();
             AdjustCollidersSize();
-            _serverStatuses = ServerStatuses.Initiated;
+            _patternNedsUpdate = false;
+        }
+
+        int workngSegments = 0;
+
+        foreach (Segment seg in _segments) {
+            if (seg.IsWorking) workngSegments++;
+        }
+        
+        
+        if (_segments.Count > 0) ProgBar.fillAmount = (float)workngSegments / _segments.Count;
+    }
+
+    private void ShowInitialSplash() {
+        foreach (Segment seg in _segments) {
+            seg.Splash(0.5f * (seg.VertexA.location.y + seg.VertexB.location.y));
         }
     }
 
-    public void GeneratePatternJSON() {
-
+    public void DebugAction() {
+        /*
         string s = "{\n";
         s += "\"points\": [\n";
         
@@ -204,6 +246,8 @@ public class PatternProxy : MonoBehaviour {
         s += "}\n";
 
         print( s);
+        */
+        _patternNedsUpdate = true;
 
     }
 }

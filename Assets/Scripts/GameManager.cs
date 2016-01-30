@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour {
     private enum States { Menu, Connecting, Ingame, Loss, Win }
     private States _state;
 
+    public PatternProxy PatternProxyInst;
+
     // Use this for initialization
     void Start () {
         // 
@@ -38,6 +40,8 @@ public class GameManager : MonoBehaviour {
         MainMenuUI.SetActive(false);
         // Ease in the camera 
         HOTween.To(cam.transform, 1, new TweenParms().Prop("localPosition", new Vector3(0.5f, -0.95f, -1.4f)).Prop("localRotation", Quaternion.Euler(316, 0 , 0)).Ease(EaseType.EaseOutQuint));
+
+        PatternProxyInst.StartGame();
     }
     
 
