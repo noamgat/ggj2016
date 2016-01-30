@@ -136,6 +136,8 @@ public class GameManager : MonoBehaviour {
     }
 
     public void PlayStartAnim() {
+        CamAnimator.SetTrigger("StartIntro");
+        TempleAnimator.SetTrigger("StartIntro");
         MainMenuUI.SetActive(false);
         _networkClient.RequestStartGame();
     }
@@ -151,8 +153,7 @@ public class GameManager : MonoBehaviour {
             switch (_pendingActions) {
                 case PendingActions.StartGame:
                     MainMenuUI.SetActive(false);
-                    CamAnimator.SetTrigger("StartIntro");
-                    TempleAnimator.SetTrigger("StartIntro");
+                    
                     break;
                 case PendingActions.StartRound:
 
