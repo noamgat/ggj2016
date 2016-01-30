@@ -1,15 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class SoundManager : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
+	public AudioClip backgroundMusic;
+	public AudioClip[] levelWinClips;
+	public AudioClip levelLoseClip;
+
+	private static SoundManager instance;
+
+	public static SoundManager Instance { get { return instance; } }
+
+	void Awake() {
+		instance = this;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	private AudioSource audioSource {
+		get {
+			return GetComponent<AudioSource> ();
+		}
 	}
+
+	public void PlayBackgroundMusic() {
+		audioSource.PlayOneShot (backgroundMusic);
+	}
+
+	public void PlayLevelWinClip(int levelIndex) {
+		AudioClip clip = levelWinClips [levelIndex % levelWinClips.Length];
+		audioSource.PlayOneShot (clip);
+	}
+
+	public void PlayLevelLoseClip() {
+		audioSource.PlayOneShot (levelLoseClip);
+	}
+
 }
