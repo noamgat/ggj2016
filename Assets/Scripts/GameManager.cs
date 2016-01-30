@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using Holoville.HOTween;
+using System;
 
 public class GameManager : MonoBehaviour {
 
@@ -20,6 +21,14 @@ public class GameManager : MonoBehaviour {
     public bool UseFakeNetworClient;
 
     private bool _pendingMainThreadAction = false;
+
+    public Animator CamAnimator;
+    public Animator TempleAnimator;
+
+    public Button StartButton;
+    public Text CountText;
+
+    private int _numPlayers;
 
     // Use this for initialization
     void Start () {
@@ -51,8 +60,9 @@ public class GameManager : MonoBehaviour {
         PatternProxyInst.myID = myID;
     }
 
-    void ServerNumberOfPlayersChanged(int obj) {
-
+    void ServerNumberOfPlayersChanged(int players) {
+        _numPlayers = players;
+        
     }
 
     private void ServerLevelStarted(PatternModel patternModel) {
@@ -88,24 +98,31 @@ public class GameManager : MonoBehaviour {
         _networkClient.NotifyFilledEdge(edgeIndex);
     }
 
-    public void SendRequestToStart(){
-        _networkClient.RequestStartGame();
+    public void PlayStartAnim() {
         MainMenuUI.SetActive(false);
+        CamAnimator.SetTrigger("StartIntro");
+        TempleAnimator.SetTrigger("StartIntro");
     }
+
+    internal void StartAnimComplete() {
+        _networkClient.RequestStartGame();
+    }
+    
 
     void Update() {
         if (_pendingMainThreadAction) {
-            // Start the game 
+
             IngameUI.SetActive(true);
-
-            // Ease in the camera 
-            HOTween.To(cam.transform, 1, new TweenParms().Prop("localPosition", new Vector3(0.5f, -0.95f, -1.4f)).Prop("localRotation", Quaternion.Euler(316, 0, 0)).Ease(EaseType.EaseOutQuint));
-
+            
+            CamAnimator.SetTrigger("StartLevel");
+            
             PatternProxyInst.StartGame();
-
-
+            
             _pendingMainThreadAction = false;
         }
+
+        StartButton.interactable = _numPlayers > 0;
+        CountText.text = "Souks Connected " + _numPlayers + "/4";
     }
 
    

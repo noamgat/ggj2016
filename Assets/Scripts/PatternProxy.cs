@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using Holoville.HOTween;
 
 public class PatternProxy : MonoBehaviour {
     
@@ -34,9 +35,18 @@ public class PatternProxy : MonoBehaviour {
 
     public bool useFakePattern;
 
+    public List<ParticleSystem> Candles;
+
+    private Tweener _barTween;
+
     internal void StartGame() {
         _isInGame = true;
         ShowInitialSplash();
+
+        ProgBar.fillAmount = 1;
+        if (_barTween != null) _barTween.Kill();
+
+        _barTween = HOTween.To(ProgBar, 10, new TweenParms().Prop("fillAmount", 0).Ease(EaseType.Linear));
     }
 
 
@@ -200,7 +210,6 @@ public class PatternProxy : MonoBehaviour {
         }
         
         
-        if (_segments.Count > 0) ProgBar.fillAmount = (float)workngSegments / _segments.Count;
     }
 
     private void ShowInitialSplash() {
@@ -231,5 +240,21 @@ public class PatternProxy : MonoBehaviour {
         */
         _patternNedsUpdate = true;
 
+    }
+
+    public void StartAnimationEnded() {
+        for (int i = 0; i < Candles.Count; i++) {
+            Invoke("LightSingleCandle", 0.08f * i);
+
+        }
+    }
+
+    private void LightSingleCandle() {
+        Candles[0].Play();
+        Candles.RemoveAt(0);
+    }
+
+    public void StartAnimComplete() {
+        GameManagerInst.StartAnimComplete();
     }
 }
