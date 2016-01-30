@@ -24,6 +24,12 @@ public interface IGameClient
 	//If the game has not started yet, request to start it
 	void RequestStartGame ();
 
+	//The game started, the user can now request to start levels
+	event System.Action onGameStarted;
+
+	//If there is no active level, start the next one
+	void RequestStartLevel ();
+
 	//Level started (will be called for subsequent levels as well)
 	event System.Action<PatternModel> onLevelStarted;
 

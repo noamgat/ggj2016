@@ -7,6 +7,8 @@ using System;
 using System.Threading;
 
 public class GameClient : IGameClient, IDisposable {
+	
+
 
 	public event System.Action<int, int> onEdgeFilled;
 	public event System.Action onLevelWon;
@@ -15,6 +17,7 @@ public class GameClient : IGameClient, IDisposable {
 	public event Action<int> onNumberOfPlayersChanged;
 	public event Action<PatternModel> onLevelStarted;
 	public event Action onLevelLost;
+	public event Action onGameStarted;
 	public event Action onGameCompleted;
 
 
@@ -59,7 +62,10 @@ public class GameClient : IGameClient, IDisposable {
 		case "num_players_changed":
 			HandleServerNumPlayersChangedMessage (dict ["data"]);
 			break;
-		case "start":
+		case "start_game":
+			HandleGameStartedMessage ();
+			break;
+		case "start_level":
 			HandleLevelStartMessage (dict ["data"]);
 			break;
 		case "fill":
@@ -120,6 +126,12 @@ public class GameClient : IGameClient, IDisposable {
 		int edgeID = Convert.ToInt32(data ["edge_id"]);
 		onEdgeFilled.Invoke(playerID, edgeID);
 	}
+
+	void HandleGameStartedMessage ()
+	{
+		onGameStarted.Invoke ();
+	}
+
 
 	void HandleServerWinLevelMessage ()
 	{
@@ -196,4 +208,8 @@ public class GameClient : IGameClient, IDisposable {
 		CloseWebSocketIfOpen ();
 	}
 
+	public void RequestStartLevel ()
+	{
+		SendMessage ("start_level", null);
+	}
 }

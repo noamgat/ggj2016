@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 public class LocalGameClient : IGameClient
 {
+	public event Action onGameStarted;
+
+	public void RequestStartLevel ()
+	{
+		filledEdges = new HashSet<int>();
+		onLevelStarted.Invoke (patternModel);
+	}
+
 	public LocalGameClient ()
 	{
 		patternModel = CreatePatternModel ();
@@ -30,8 +38,7 @@ public class LocalGameClient : IGameClient
 
 	public void RequestStartGame ()
 	{
-		filledEdges = new HashSet<int>();
-		onLevelStarted.Invoke (patternModel);
+		onGameStarted.Invoke();
 	}
 
 	private HashSet<int> filledEdges;

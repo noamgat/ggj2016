@@ -23,8 +23,14 @@ public class GameClientWrapper : MonoBehaviour {
 		gameClient.onLevelStarted += GameClient_onLevelStarted;
 		gameClient.onLevelLost += GameClient_onLevelLost;
 		gameClient.onGameCompleted += GameClient_onGameCompleted;
+		gameClient.onGameStarted += GameClient_onGameStarted;
 		Debug.Log ("Calling load");
 		gameClient.Connect ();
+	}
+
+	void GameClient_onGameStarted ()
+	{
+		Debug.Log ("Game started");
 	}
 
 	void GameClient_onGameCompleted ()
@@ -78,9 +84,14 @@ public class GameClientWrapper : MonoBehaviour {
 	}
 
 
-	[ContextMenu("Send request start")]
-	public void RequestStart() {
+	[ContextMenu("Send request start game")]
+	public void RequestStartGame() {
 		gameClient.RequestStartGame ();
+	}
+
+	[ContextMenu("Send request start level")]
+	public void RequestStartLevel() {
+		gameClient.RequestStartLevel ();
 	}
 
 
