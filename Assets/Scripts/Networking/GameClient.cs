@@ -8,6 +8,16 @@ using System.Threading;
 
 public class GameClient : IGameClient, IDisposable {
 
+	public event System.Action<int, int> onEdgeFilled;
+	public event System.Action onLevelWon;
+	public event Action<int> onConnected;
+	public event Action<string> onClientError;
+	public event Action<int> onNumberOfPlayersChanged;
+	public event Action<PatternModel> onLevelStarted;
+	public event Action onLevelLost;
+	public event Action onGameCompleted;
+
+
 	private string url;
 	private WebSocket webSocket;
 
@@ -18,6 +28,7 @@ public class GameClient : IGameClient, IDisposable {
 	void WebSocket_OnError (object sender, ErrorEventArgs e)
 	{
 		Debug.Log("Websocket error : " + e.Message);
+		onClientError.Invoke (e.Message);
 	}
 
 	void WebSocket_OnClose (object sender, CloseEventArgs e)
@@ -42,32 +53,56 @@ public class GameClient : IGameClient, IDisposable {
 		IDictionary<string, object> dict = (IDictionary<string, object>)json;
 		string action = (string)dict ["action"];
 		switch (action) {
-		case "load":
-			HandleServerLoadMessage (dict ["data"]);
+		case "connect":
+			HandleServerConnectMessage (dict ["data"]);
+			break;
+		case "num_players_changed":
+			HandleServerNumPlayersChangedMessage (dict ["data"]);
+			break;
+		case "start":
+			HandleLevelStartMessage (dict ["data"]);
 			break;
 		case "fill":
 			HandleServerFillMessage (dict ["data"]);
 			break;
-		case "win":
-			HandleServerWinMessage ();
+		case "win_level":
+			HandleServerWinLevelMessage ();
+			break;
+		case "lose_level":
+			HandleServerLoseLevelMessage ();
+			break;
+		case "complete":
+			HandleServerCompleteGameMessage ();
 			break;
 		}
 	}
 
-	void HandleServerLoadMessage (object obj)
+	void HandleServerConnectMessage (object obj)
 	{
 		IDictionary<string, object> data = (IDictionary<string, object>)obj;
 		int playerID = Convert.ToInt32(data ["player_id"]);
+		onConnected.Invoke (playerID);
+	}
+
+	void HandleServerNumPlayersChangedMessage (object obj)
+	{
+		IDictionary<string, object> data = (IDictionary<string, object>)obj;
+		int numPlayers = Convert.ToInt32(data ["num_players"]);
+		onNumberOfPlayersChanged.Invoke (numPlayers);
+	}
+
+	void HandleLevelStartMessage (object obj)
+	{
+		IDictionary<string, object> data = (IDictionary<string, object>)obj;
 		data = (IDictionary<string, object>)data ["pattern"];
 		PatternModel pattern = new PatternModel ();
 		List<object> points = (List<object>)data ["points"];
 		List<object> edges = (List<object>)data ["edges"];
 		pattern.points = points.ConvertAll<Vector2>(ParseVector2).ToArray();
 		pattern.edges = edges.ConvertAll<int[]>(ParseEdge);
-		onLoaded.Invoke (pattern, playerID);
-
+		onLevelStarted.Invoke (pattern);
 	}
-	
+
 	private static Vector2 ParseVector2(object obj) {
 		List<object> floats = (List<object>)obj;
 		return new Vector2 (Convert.ToSingle (floats [0]), Convert.ToSingle (floats [1]));
@@ -86,36 +121,50 @@ public class GameClient : IGameClient, IDisposable {
 		onEdgeFilled.Invoke(playerID, edgeID);
 	}
 
-	void HandleServerWinMessage ()
+	void HandleServerWinLevelMessage ()
 	{
 		onLevelWon.Invoke ();
 	}
 
-	private byte[] CreateMessage(string action, IDictionary<string, object> data) {
+	void HandleServerLoseLevelMessage ()
+	{
+		onLevelLost.Invoke ();
+	}
+
+	void HandleServerCompleteGameMessage ()
+	{
+		onGameCompleted.Invoke ();
+	}
+
+	private void SendMessage(string action, IDictionary<string, object> data) {
 		IDictionary<string, object> messageDict = new Dictionary<string, object> ();
 		messageDict ["action"] = action;
 		if (data != null) {
 			messageDict ["data"] = data;
 		}
 		string jsonString = MiniJSON.Json.Serialize (messageDict);
-		return System.Text.Encoding.UTF8.GetBytes(jsonString);
+		byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
+		//new Thread (SendBytes).Start (bytes);
+		SendBytes(bytes);
 	}
 
-	#region IGameClient implementation
-	public event System.Action<PatternModel, int> onLoaded;
-	public event System.Action<int, int> onEdgeFilled;
-	public event System.Action onLevelWon;
+	private void SendBytes(object bytesObj) {
+		byte[] bytes = (byte[])bytesObj;
+		webSocket.Send (bytes);
+	}
+
+	public void RequestStartGame ()
+	{
+		SendMessage ("start", null);
+	}
 
 	public void NotifyFilledEdge (int edgeID)
 	{
-		webSocket.Send(CreateMessage("fill", new Dictionary<string, object>() {
+		SendMessage("fill", new Dictionary<string, object>() {
 			{"edge_id", edgeID}
-		}));
+		});
 	}
-
-
-
-	public void Load ()
+	public void Connect ()
 	{
 		CloseWebSocketIfOpen ();
 		webSocket = new WebSocket (url);
@@ -146,5 +195,5 @@ public class GameClient : IGameClient, IDisposable {
 	public void Dispose() {
 		CloseWebSocketIfOpen ();
 	}
-	#endregion
+
 }

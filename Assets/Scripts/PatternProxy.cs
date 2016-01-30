@@ -48,11 +48,36 @@ public class PatternProxy : MonoBehaviour {
         }
         
 
-        _networkClient.onLoaded += ServerLoaded;
+		_networkClient.onConnected += ServerConnected;
+		_networkClient.onLevelStarted += ServerLevelStarted;
         _networkClient.onEdgeFilled += EdgeFilledByPlayer;
         _networkClient.onLevelWon += LevelWon;
+		_networkClient.onClientError += ServerHadError;
+		_networkClient.onGameCompleted += ServerCompletedGame;
+		_networkClient.onLevelLost += ServerLostLevel;
+		_networkClient.onNumberOfPlayersChanged += ServerNumberOfPlayersChanged;
 
-        _networkClient.Load();
+        _networkClient.Connect();
+    }
+
+    void ServerNumberOfPlayersChanged (int obj)
+    {
+		
+    }
+
+    void ServerLostLevel ()
+    {
+		
+    }
+
+    void ServerCompletedGame ()
+    {
+		
+    }
+
+    void ServerHadError (string obj)
+    {
+		
     }
 
     internal void StartGame() {
@@ -71,13 +96,19 @@ public class PatternProxy : MonoBehaviour {
         
     }
 
-    private void ServerLoaded(PatternModel patternModel, int myID) {
+    private void ServerConnected(int myID) {
         _myID = myID;
         
         _patternModel = patternModel;
         _patternNedsUpdate = true;
 
     }
+
+	private void ServerLevelStarted(PatternModel patternModel) {
+		_serverStatuses = ServerStatuses.Ready;
+		_patternModel = patternModel;
+
+	}
 
     private void AdjustCollidersSize() {
         foreach (Vertex verA in _verteces) {

@@ -15,11 +15,38 @@ public class GameClientWrapper : MonoBehaviour {
 		} else {
 			gameClient = new GameClient (url);
 		}
-		gameClient.onLoaded += GameClient_onLoaded;
+		gameClient.onConnected += GameClient_onConnected;
 		gameClient.onLevelWon += GameClient_onLevelWon;
 		gameClient.onEdgeFilled += GameClient_onEdgeFilled;
+		gameClient.onNumberOfPlayersChanged += GameClient_onNumberOfPlayersChanged;
+		gameClient.onClientError += GameClient_onClientError;
+		gameClient.onLevelStarted += GameClient_onLevelStarted;
+		gameClient.onLevelLost += GameClient_onLevelLost;
 		Debug.Log ("Calling load");
-		gameClient.Load ();
+		gameClient.Connect ();
+	}
+
+	void GameClient_onLevelLost ()
+	{
+		Debug.Log ("Level lost");
+	}
+
+	private PatternModel pattern;
+
+	void GameClient_onLevelStarted (PatternModel obj)
+	{
+		this.pattern = obj;
+		Debug.Log ("Level started");
+	}
+
+	void GameClient_onClientError (string obj)
+	{
+		Debug.Log ("Client error : " + obj);
+	}
+
+	void GameClient_onNumberOfPlayersChanged (int obj)
+	{
+		Debug.Log ("Number of players changed : " + obj);
 	}
 
 	void GameClient_onEdgeFilled (int arg1, int arg2)
@@ -32,13 +59,23 @@ public class GameClientWrapper : MonoBehaviour {
 		Debug.Log ("Level won");
 	}
 
-	void GameClient_onLoaded (PatternModel arg1, int arg2)
+	void GameClient_onConnected (int arg2)
 	{
-		Debug.Log ("Level loaded");
+		Debug.Log ("Connected as player : " + arg2);
 	}
 
-	[ContextMenu("Send filled edge zero")]
+	[ContextMenu("Send filled all edges")]
 	public void SendFilledEdgeZero(){
-		gameClient.NotifyFilledEdge (0);
+		for (int i = 0; i < this.pattern.edges.Count; i++) {
+			gameClient.NotifyFilledEdge (i);
+		}
 	}
+
+
+	[ContextMenu("Send request start")]
+	public void RequestStart() {
+		gameClient.RequestStartGame ();
+	}
+
+
 }
