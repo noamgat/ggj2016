@@ -23,15 +23,18 @@ public class SoundManager : MonoBehaviour {
 	}
 
 	public void PlayBackgroundMusic() {
+		audioSource.Stop ();
 		audioSource.PlayOneShot (backgroundMusic);
 	}
 
 	public void PlayLevelWinClip(int levelIndex) {
 		AudioClip clip = levelWinClips [levelIndex % levelWinClips.Length];
+		audioSource.Stop ();
 		audioSource.PlayOneShot (clip);
 	}
 
 	public void PlayLevelLoseClip() {
+		audioSource.Stop ();
 		audioSource.PlayOneShot (levelLoseClip);
 	}
 
