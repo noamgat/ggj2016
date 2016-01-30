@@ -72,6 +72,11 @@ $("#load-image-modal .btn-primary").on("click", function(e) {
 	}
 	$('#load-image-modal').modal('hide');
 })
+$("#undo-btn").on("click", function(e) {
+	undo()
+})
+
+
 
 startDrawing = function(e) {
 	drawing = true; 
