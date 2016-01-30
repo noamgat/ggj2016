@@ -156,8 +156,8 @@ public class GameClient : IGameClient, IDisposable {
 		}
 		string jsonString = MiniJSON.Json.Serialize (messageDict);
 		byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
-		//new Thread (SendBytes).Start (bytes);
-		SendBytes(bytes);
+		new Thread (SendBytes).Start (bytes);
+		//SendBytes(bytes);
 	}
 
 	private void SendBytes(object bytesObj) {
