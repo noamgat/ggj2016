@@ -38,27 +38,11 @@ public class GameManager : MonoBehaviour {
     void Start () {
         
         
-        
-
         InitMainMenu();
     }
 
     private void InitMainMenu() {
-
-        if (_networkClient != null) {
-            _networkClient.onConnected -= ServerConnected;
-            _networkClient.onLevelStarted -= ServerLevelStarted;
-            _networkClient.onGameStarted -= ServerGameStarted;
-            _networkClient.onEdgeFilled -= EdgeFilledByPlayer;
-            _networkClient.onLevelWon -= ServerLevelWon;
-            _networkClient.onClientError -= ServerHadError;
-            _networkClient.onGameCompleted -= ServerCompletedGame;
-            _networkClient.onLevelLost -= ServerLostLevel;
-            _networkClient.onNumberOfPlayersChanged -= ServerNumberOfPlayersChanged;
-
-            (_networkClient as GameClient).Dispose();
-        }
-
+        
 
         if (UseFakeNetworClient) {
             _networkClient = new LocalGameClient();
@@ -83,6 +67,21 @@ public class GameManager : MonoBehaviour {
         MainMenuUI.SetActive(true);
     }
 
+    private void KillNetwork() {
+        
+        _networkClient.onConnected -= ServerConnected;
+        _networkClient.onLevelStarted -= ServerLevelStarted;
+        _networkClient.onGameStarted -= ServerGameStarted;
+        _networkClient.onEdgeFilled -= EdgeFilledByPlayer;
+        _networkClient.onLevelWon -= ServerLevelWon;
+        _networkClient.onClientError -= ServerHadError;
+        _networkClient.onGameCompleted -= ServerCompletedGame;
+        _networkClient.onLevelLost -= ServerLostLevel;
+        _networkClient.onNumberOfPlayersChanged -= ServerNumberOfPlayersChanged;
+
+        (_networkClient as GameClient).Dispose();
+        
+    }
 
     private void ServerConnected(int myID) {
         PatternProxyInst.myID = myID;
@@ -166,7 +165,7 @@ public class GameManager : MonoBehaviour {
 
                     PatternProxyInst.StartRound();
 
-                    _pendingMainThreadAction = false;
+                    
                     break;
 				case PendingActions.PlayWin:
 					IngameUI.SetActive (false);
@@ -177,13 +176,18 @@ public class GameManager : MonoBehaviour {
 				case PendingActions.PlayLoose:
 					SoundManager.Instance.PlayLevelLoseClip ();
                     Invoke("InitMainMenu", 3);
+                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!lose");
                     PatternProxyInst.EndRound(false);
                     break;
                 case PendingActions.GameComplete:
+                    KillNetwork();
+                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!coplete");
                     Invoke("InitMainMenu", 3);
                     
                     break;
             }
+
+            _pendingMainThreadAction = false;
         }
 
         StartButton.interactable = _numPlayers > 0;
