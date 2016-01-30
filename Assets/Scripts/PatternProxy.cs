@@ -18,7 +18,9 @@ public class PatternProxy : MonoBehaviour {
     private List<Vertex> _verteces = new List<Vertex>();
     private List<Segment> _segments = new List<Segment>();
 
-    private Vertex _lastContact;
+	private Vertex _lastContact;
+	private Dictionary<Vertex, float> _lastContactTimes;
+	public float segmentTouchTimeThreshold = 0.2f;
 
     internal int myID;
 
@@ -47,6 +49,8 @@ public class PatternProxy : MonoBehaviour {
         if (_barTween != null) _barTween.Kill();
 
         _barTween = HOTween.To(ProgBar, 30, new TweenParms().Prop("fillAmount", 0).Ease(EaseType.Linear));
+		_lastContactTimes = new Dictionary<Vertex, float> ();
+		_lastContact = null;
     }
 
     internal void EndRound(bool win) {
@@ -162,18 +166,30 @@ public class PatternProxy : MonoBehaviour {
             
     }
 
+	private float GetLastVertexTouchTime(Vertex v) {
+		float val;
+		_lastContactTimes.TryGetValue (v, out val);
+		return val;
+	}
+
     internal void CheckCollision(Collider collider) {
         if (!_isInGame) return;
 
         Vertex vertex = collider.GetComponent<Vertex>();
         if (vertex != null && _lastContact != vertex && _verteces.IndexOf(vertex) > -1) {
-
+			_lastContactTimes [vertex] = Time.realtimeSinceStartup;
             foreach (Segment seg in _segments) {
-                if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
-                    seg.AddPlayer(Players.IndexOf(myID));
-                    //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
-                    GameManagerInst.NotifyFilledEdge(_segments.IndexOf(seg));
-                }
+				float otherVertexTouchTime = -1;
+				if (seg.VertexA == vertex) {
+					otherVertexTouchTime = GetLastVertexTouchTime (seg.VertexB);
+				} else if (seg.VertexB == vertex) {
+					otherVertexTouchTime = GetLastVertexTouchTime (seg.VertexA);
+				}
+				if (otherVertexTouchTime > Time.realtimeSinceStartup - segmentTouchTimeThreshold) {
+					seg.AddPlayer(Players.IndexOf(myID));
+					//seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
+					GameManagerInst.NotifyFilledEdge(_segments.IndexOf(seg));
+				}
             }
 
             _lastContact = vertex;
