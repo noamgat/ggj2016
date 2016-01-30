@@ -73,7 +73,7 @@ $("#load-image-modal .btn-primary").on("click", function(e) {
 	$('#load-image-modal').modal('hide');
 })
 $("#undo-btn").on("click", function(e) {
-	undo()
+	undo();
 })
 
 
@@ -89,7 +89,8 @@ stopDrawing = function(e) {
 	
 	if (e.offsetX) {
 		updatePreview("end", e.offsetX, e.offsetY);
-		addShape();
+		if(!pointsEqual(preview.start, preview.end))
+			addShape();
 	}
 	render();
 }
@@ -137,25 +138,31 @@ $(document).on("mouseup", function(e) {
 		cancelDrawing();
 });
 
+getPointInDist = function(minDist, p) {
+	minDist = minDist || 0.025;
+	for (i = 0; i < points.length - 1; i++) {
+		if (distance(p, points[i]) <= minDist) 		
+			return i;
+	}
+}
 // Addition of the currently drawn shape into the list
 // Shapes are independent of the grid on purpose
 addShape_line = function() {
 	distX = preview.end[0] - preview.start[0];
 	distY = preview.end[1] - preview.start[1];
-	steps = Math.round(distance(preview.start, preview.end) / gridSize);
-	
+	steps = Math.ceil(distance(preview.start, preview.end) / gridSize);
 	stepX = distX / steps;
 	stepY = distY / steps;
 
 	for (i = 0; i <= steps; i++) {
-		coordinates = [
-			preview.start[0] + stepX * i,
-			preview.start[1] + stepY * i
-			];
-		points.push(coordinates);
+		x = preview.start[0] + stepX * i;
+		y = preview.start[1] + stepY * i;
+		points.push([x, y]);
 	}
 }
 addShape_circle = function() {
+	if (pointsEqual(preview.start, preview.end))
+		return;
 	a = generateCirlce(preview.start, preview.end);
 	for (i = 0; i < a.length; i++) {
 		points.push(a[i]);
@@ -164,6 +171,7 @@ addShape_circle = function() {
 addShape_free = function() {}
 addShape_remove = function() {}
 addShape = function() {
+	console.log("added shape");
 	// Save current step
 	addHistoryStep();
 
@@ -200,11 +208,12 @@ drawLine = function (p1, p2, color) {
 	ctx.stroke();
 }
 generateCirlce = function(p1, p2) {
+
+	dist = distance(p1, p2);
+	step = Math.max(1-dist, 0.2);
+	
 	centerX = (p1[0] + p2[0]) / 2; 
 	centerY = (p1[1] + p2[1]) / 2;
-
-	dist = distance(p1, p2);;
-	step = (1 - dist) / 2;
 
 	radx = (p1[1] - p2[1]) / 2;
 	rady = (p1[0] - p2[0]) / 2;
@@ -218,6 +227,8 @@ generateCirlce = function(p1, p2) {
 	return arr;
 }
 drawCircle = function (p1, p2, color) {
+	if (pointsEqual(p1, p2))
+		return;
 	a = generateCirlce(p1, p2)
 	for (var i = 0; i < a.length; i++) 
 	    drawPoint(a[i], color);	
@@ -232,6 +243,7 @@ renderPreview_circle = function() {
 }
 renderPreview_free = function() {
 }
+
 // Remove points
 renderPreview_remove = function() {
 	minDist = 0.025;
@@ -310,6 +322,12 @@ undo = function () {
 
 distance = function (p1, p2) {
 	return Math.sqrt( (p1[0]-p2[0]) * (p1[0]-p2[0]) + (p1[1]-p2[1]) * (p1[1]-p2[1]) );
+}
+
+pointsEqual = function (p1, p2) {
+	if (p1[0] == p2[0] && p1[1] == p2[1])
+		return true
+	return false;
 }
 
 
