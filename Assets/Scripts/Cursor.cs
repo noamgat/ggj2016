@@ -8,6 +8,7 @@ public class Cursor : MonoBehaviour {
     public PatternProxy PatternProxyInst;
 
     private bool _isMouseDown = false;
+    private bool _isTouchDown = false;
 
     // Use this for initialization
     void Start () {
@@ -19,9 +20,11 @@ public class Cursor : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0)) _isMouseDown = true;
         if (Input.GetMouseButtonUp(0)) _isMouseDown = false;
-        
 
-        if (_isMouseDown) {
+        _isTouchDown = Input.touchCount > 0;
+
+
+        if (_isMouseDown || _isTouchDown) {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float rayDistance;
             if (groundPlane.Raycast(ray, out rayDistance))

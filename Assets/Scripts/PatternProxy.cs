@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class PatternProxy : MonoBehaviour {
 
+    private enum ServerStatuses { Waiting, Ready, Initiated };
     
     public Vector2[] TargetPoints;
     public int[] TargetSegments;
@@ -17,16 +18,29 @@ public class PatternProxy : MonoBehaviour {
 
     private Vertex _lastContact;
 
-    public int MyID;
+    internal int _myID;
 
     public float SegmentLifetime;
     public List<int> Players;
 
-    private IGameClient _networkClient = new LocalGameClient();
+    //private IGameClient _networkClient = new LocalGameClient();
+    //private IGameClient _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
+    private IGameClient _networkClient;
 
+    private ServerStatuses _serverStatuses = ServerStatuses.Waiting;
+    private PatternModel _patternModel;
+
+    public bool UseLocal;
 
     // Use this for initialization
     void Start () {
+
+        if (UseLocal) {
+            _networkClient = new LocalGameClient();
+        } else {
+            _networkClient = new GameClient("wss://ggj2016-server.herokuapp.com/room");
+        }
+        
 
         _networkClient.onLoaded += ServerLoaded;
         _networkClient.onEdgeFilled += EdgeFilledByPlayer;
@@ -40,15 +54,31 @@ public class PatternProxy : MonoBehaviour {
     }
 
     private void EdgeFilledByPlayer(int playerID, int edgeId) {
-        if (playerID != MyID) {
-            _segments[edgeId].AddPlayer(Players.IndexOf(MyID));
+        if (playerID != _myID) {
+            _segments[edgeId].AddPlayer(Players.IndexOf(playerID));
         }
         
     }
 
     private void ServerLoaded(PatternModel patternModel, int myID) {
-        MyID = myID;
-        CreatePattern(patternModel);
+        _myID = myID;
+        _serverStatuses = ServerStatuses.Ready;
+        _patternModel = patternModel;
+        
+    }
+
+    private void AdjustCollidersSize() {
+        foreach (Vertex verA in _verteces) {
+            foreach (Vertex verB in _verteces) {
+                if (verA != verB) {
+                    float dist = (verA.location - verB.location).magnitude;
+                    if (dist < 0.09f) {
+                        verA.SetColliderSize(dist * 0.35f);
+                        verB.SetColliderSize(dist * 0.35f);
+                    }
+                }
+            }
+        }
     }
 
     private void CreatePattern(PatternModel patternModel) {
@@ -135,7 +165,7 @@ public class PatternProxy : MonoBehaviour {
 
             foreach (Segment seg in _segments) {
                 if ((seg.VertexA == vertex || seg.VertexB == vertex) && (seg.VertexA == _lastContact || seg.VertexB == _lastContact)) {
-                    seg.AddPlayer(Players.IndexOf(MyID));
+                    seg.AddPlayer(Players.IndexOf(_myID));
                     //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
                     _networkClient.NotifyFilledEdge(_segments.IndexOf(seg));
                 }
@@ -144,5 +174,36 @@ public class PatternProxy : MonoBehaviour {
             _lastContact = vertex;
             
         }
+    }
+
+    void Update() {
+        if (_serverStatuses == ServerStatuses.Ready) {
+            CreatePattern(_patternModel);
+            //CreatePattern();
+            AdjustCollidersSize();
+            _serverStatuses = ServerStatuses.Initiated;
+        }
+    }
+
+    public void GeneratePatternJSON() {
+
+        string s = "{\n";
+        s += "\"points\": [\n";
+        
+        foreach (Vertex ver in _verteces) {
+            s += "[" + ver.location.x + ',' + ver.location.y + "],\n";
+        }
+        s += "]\n";
+        s += "\"edges\": [\n";
+
+        foreach (Segment seg in _segments) {
+            s += "[" + _verteces.IndexOf(seg.VertexA) + ',' + _verteces.IndexOf(seg.VertexB) + "],\n";
+        }
+        s += "]\n";
+
+        s += "}\n";
+
+        print( s);
+
     }
 }

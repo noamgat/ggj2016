@@ -80,8 +80,8 @@ public class GameClient : IGameClient {
 	void HandleServerFillMessage (object obj)
 	{
 		IDictionary<string, object> data = (IDictionary<string, object>)obj;
-		int playerID = (int)data ["player_id"];
-		int edgeID = (int)data ["edge_id"];
+		int playerID = Convert.ToInt32(data ["player_id"]);
+		int edgeID = Convert.ToInt32(data ["edge_id"]);
 		onEdgeFilled.Invoke(playerID, edgeID);
 	}
 

@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Holoville.HOTween;
 
 public class Segment : MonoBehaviour {
-    
 
-    public Vertex VertexA;
-    public Vertex VertexB;
+
+    internal Vertex VertexA;
+    internal Vertex VertexB;
 
     private float[] playerIndexes;
     
@@ -15,9 +16,14 @@ public class Segment : MonoBehaviour {
     private int fromColor = 0;
     private int toColor = 0;
 
-    private Color[] _colors;
+    public Texture[] FireTextures;
 
-    private Material mat;
+    private Color[] _colors;
+    private Color _transColor = new Color(0, 0, 0, 0);
+
+    private Material[] WallMat = new Material[2];
+
+    public GameObject[] Walls;
 
     internal void Init(int numOPlayers, float lifetime) {
         _lifetime = lifetime;
@@ -29,7 +35,8 @@ public class Segment : MonoBehaviour {
         _colors[2] = Color.blue;
         _colors[3] = Color.yellow;
 
-        mat = GetComponentInChildren<Renderer>().material;
+        WallMat[0] = Walls[0].GetComponent<Renderer>().material;
+        WallMat[1] = Walls[1].GetComponent<Renderer>().material;
     }
 
     public void Place() {
@@ -60,11 +67,20 @@ public class Segment : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        
+
+        WallMat[0].mainTexture = FireTextures[UnityEngine.Random.Range(0, FireTextures.Length)];
+        WallMat[1].mainTexture = FireTextures[UnityEngine.Random.Range(0, FireTextures.Length)];
+
+        HOTween.To(WallMat[0], Random.Range(0.8f, 1.2f), new TweenParms().Prop("mainTextureOffset", new Vector2(0.8f, 0)).Ease(EaseType.Linear).Loops(-1, LoopType.Restart));
+        HOTween.To(WallMat[1], Random.Range(0.8f, 1.2f), new TweenParms().Prop("mainTextureOffset", new Vector2(0.8f, 0)).Ease(EaseType.Linear).Loops(-1, LoopType.Restart));
+
     }
 	
 	// Update is called once per frame
 	void Update () {
+
+        
+
         float maxIntensity = 0;
         for (int i = 0; i < playerIndexes.Length; i++) {
             playerIndexes[i] -= Time.deltaTime / _lifetime;
@@ -99,8 +115,10 @@ public class Segment : MonoBehaviour {
 
         float visIntesity = Mathf.Min(1, maxIntensity * 4);
 
-        targetColor = Color.Lerp(Color.white, targetColor, visIntesity);
-
-        mat.color = targetColor;
+        //targetColor = Color.Lerp(_transColor, targetColor, visIntesity);
+        targetColor.a = visIntesity;
+        WallMat[0].color = targetColor;
+        WallMat[1].color = targetColor;
+        
     }
 }

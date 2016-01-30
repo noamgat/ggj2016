@@ -10,14 +10,7 @@ public class Vertex : MonoBehaviour {
         transform.localPosition = location;
     }
 
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-    
+    public void SetColliderSize(float colSize) {
+        GetComponent<SphereCollider>().radius = colSize;
+    }
 }
