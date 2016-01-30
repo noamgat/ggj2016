@@ -8,15 +8,16 @@ h = $(canvas).height();
 ctx.transform(1, 0, 0, -1, 0, canvas.height);
 
 // Current selected tool
-var tool = "line"; 
+var tool = "remove"; 
 var drawing = false; 
 var preview = {start: [0, 0], end: [0, 0]}
 // Current loaded map
-var points = [];
-var edges  = [];
+var points = [[0.2, 0.2], [0.5, 0.5], [0.8, 0.8], [0.9, 0.9]];
+var edges  = [[0,1], [1,2], [2,3]];
 
 pointSize = 4; 
 gridSize = 0.05;
+snapping = true;
 
 // Tool selection
 $(".editor-tools button").on("click", function(e) {
@@ -24,6 +25,15 @@ $(".editor-tools button").on("click", function(e) {
 	$target = $(e.currentTarget);
 	$target.addClass("active");
 	tool = $target.attr("data-tool");
+})
+$("#snapping-btn").on("click", function(e) {
+	if (snapping){ 
+		snapping = false;
+		$("#snapping-btn").removeClass("btn-danger active");
+	} else {
+		snapping = true
+		$("#snapping-btn").addClass("btn-danger active");
+	}
 })
 // Modal opening
 $("#export-btn").on("click", function(e) {
@@ -87,8 +97,10 @@ draw = function(e) {
 	render();
 }
 updatePreview = function(type, x, y) {
-	x = numberToGrid(x);
-	y = numberToGrid(y);
+	if (snapping && (tool == "line" || tool == "circle")) {
+		x = numberToGrid(x);
+		y = numberToGrid(y);
+	}
 	preview[type] = [
 		transformCanvasToUnityX(x), 
 		transformCanvasToUnityY(y)
@@ -203,11 +215,6 @@ drawCircle = function (p1, p2, color) {
 	for (var i = 0; i < a.length; i++) 
 	    drawPoint(a[i], color);	
 }
-// .. 
-loadLevel = function(level) {
-	//...
-	render();
-}
 
 // Render previews
 renderPreview_line = function() {
@@ -218,7 +225,31 @@ renderPreview_circle = function() {
 }
 renderPreview_free = function() {
 }
+// Remove points
 renderPreview_remove = function() {
+	minDist = 0.025;
+	// If the minimum distance is met, remove the point
+	// We go on the reverse order in order to splice properly
+	for (i = points.length - 1; i >= 0; i--) {
+		if (distance(preview.end, points[i]) <= minDist) {		
+			removePoint(i);
+		}
+	}
+}
+// Removing the point by splicing the array
+// We temporarily throw the points out of the canvas for now
+removePoint = function(i) {
+	//points.splice(i, 1);
+	points[i] = [-1.5, -1.5];
+	removeSegmentByPoint(i);
+}
+// We then have to then remove any reference point in edges
+removeSegmentByPoint = function (p) {
+	for (i = edges.length - 1; i >= 0; i--) {
+		if (edges[i][0] == p || edges[i][1] == p) {
+			edges.splice(i, 1);
+		}
+	}
 }
 
 render = function() {
@@ -252,6 +283,8 @@ render = function() {
 }
 
 distance = function (p1, p2) {
-	return Math.sqrt( (p1[0]-p2[0]) * (p1[0]-p2[0]) + (p1[1]-p1[1]) * (p1[1]-p1[1]) );
+	return Math.sqrt( (p1[0]-p2[0]) * (p1[0]-p2[0]) + (p1[1]-p2[1]) * (p1[1]-p2[1]) );
 }
 
+
+render();
