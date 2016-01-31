@@ -272,7 +272,7 @@ public class PatternProxy : MonoBehaviour {
 
     public void StartAnimationEnded() {
         for (int i = 0; i < Candles.Length; i++) {
-            Candles[i].Lightdelay(0.08f * i);
+            Candles[i].Lightdelay(2 + 0.08f * i);
             
         }
     }

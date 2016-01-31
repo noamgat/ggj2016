@@ -3,39 +3,49 @@ using System.Collections;
 
 [RequireComponent(typeof(AudioSource))]
 public class SoundManager : MonoBehaviour {
-
-	public AudioClip backgroundMusic;
-	public AudioClip[] levelWinClips;
+    
+	public AudioClip levelWinClip;
 	public AudioClip levelLoseClip;
+    public AudioClip[] levelStartClips;
 
-	private static SoundManager instance;
+    private static SoundManager instance;
 
 	public static SoundManager Instance { get { return instance; } }
 
-	void Awake() {
-		instance = this;
-	}
 
-	private AudioSource audioSource {
-		get {
-			return GetComponent<AudioSource> ();
-		}
-	}
+    private AudioSource _backSrc;
+    private AudioSource _effectsSrc;
+
+    void Awake() {
+		instance = this;
+        _backSrc = GetComponents<AudioSource>()[0];
+        _effectsSrc = GetComponents<AudioSource>()[1];
+    }
+    
 
 	public void PlayBackgroundMusic() {
-		audioSource.Stop ();
-		audioSource.PlayOneShot (backgroundMusic);
+        _backSrc.Stop ();
+        _backSrc.Play();
 	}
 
-	public void PlayLevelWinClip(int levelIndex) {
-		AudioClip clip = levelWinClips [levelIndex % levelWinClips.Length];
-		audioSource.Stop ();
-		audioSource.PlayOneShot (clip);
+    public void StopBackgroundMusic() {
+        _backSrc.Stop();
+    }
+
+    public void PlayLevelWinClip() {
+        _effectsSrc.Stop();
+        _effectsSrc.PlayOneShot(levelWinClip);
+    }
+
+    public void PlayLevelStartClip(int levelIndex) {
+		AudioClip clip = levelStartClips[levelIndex % levelStartClips.Length];
+        _effectsSrc.Stop ();
+        _effectsSrc.PlayOneShot (clip);
 	}
 
 	public void PlayLevelLoseClip() {
-		audioSource.Stop ();
-		audioSource.PlayOneShot (levelLoseClip);
+        _effectsSrc.Stop ();
+        _effectsSrc.PlayOneShot (levelLoseClip);
 	}
 
 }

@@ -81,6 +81,8 @@ public class GameManager : MonoBehaviour {
         MainMenuUI.SetActive(true);
 
         _currentLevel = -1;
+
+        SoundManager.Instance.PlayBackgroundMusic();
     }
 
     private void KillNetwork() {
@@ -170,6 +172,7 @@ public class GameManager : MonoBehaviour {
     private float PlayInerLEvelAnim() {
         if (_currentLevel == 0) {
             Altar1.SetTrigger("SwitchLevel");
+            PatternProxyInst.StartAnimationEnded();
         } else if (_currentLevel == 1) {
 
             Altar2.SetTrigger("SwitchLevel");
@@ -190,6 +193,7 @@ public class GameManager : MonoBehaviour {
 
             switch (_pendingActions) {
                 case PendingActions.StartGame:
+                    SoundManager.Instance.PlayLevelStartClip(_numLevelsWon);
                     MainMenuUI.SetActive(false);
                     CamAnimator.SetTrigger("StartLevel");
                     FloorText.text = "";
@@ -199,16 +203,14 @@ public class GameManager : MonoBehaviour {
                     _currentLevel++;
                     LevelBackground.GetComponent<Renderer>().material.mainTexture = LevelTextures[_currentLevel];
                     IngameUI.SetActive(true);
-					SoundManager.Instance.PlayBackgroundMusic ();
                     
-
                     PatternProxyInst.StartRound();
                     FloorText.text = "Engrave";
                     
                     break;
 				case PendingActions.PlayWin:
 					IngameUI.SetActive (false);
-					SoundManager.Instance.PlayLevelWinClip (_numLevelsWon);
+					SoundManager.Instance.PlayLevelWinClip ();
                     Invoke("StartRound", PlayInerLEvelAnim());
                     PatternProxyInst.EndRound(true);
 
@@ -216,10 +218,12 @@ public class GameManager : MonoBehaviour {
 
                     break;
 				case PendingActions.PlayLoose:
-					SoundManager.Instance.PlayLevelLoseClip ();
-                    Invoke("InitMainMenu", 3);
+                    SoundManager.Instance.StopBackgroundMusic();
+                    SoundManager.Instance.PlayLevelLoseClip ();
+                    Invoke("InitMainMenu", 4);
                     PatternProxyInst.EndRound(false);
                     FloorText.text = "You are weak";
+                    
                     break;
                 case PendingActions.GameComplete:
                     KillNetwork();
