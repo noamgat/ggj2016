@@ -42,6 +42,8 @@ public class GameManager : MonoBehaviour {
 
     private int _currentLevel;
 
+    public int MinPlayers;
+
     // Use this for initialization
     void Start () {
         
@@ -208,8 +210,8 @@ public class GameManager : MonoBehaviour {
             _pendingMainThreadAction = false;
         }
 
-        StartButton.interactable = _numPlayers > 0;
-        CountText.text = "Souks Connected " + _numPlayers + "/4";
+        StartButton.interactable = _numPlayers >= MinPlayers;
+        CountText.text = "Souls Connected " + _numPlayers + "/4";
     }
 
    
