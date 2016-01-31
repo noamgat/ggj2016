@@ -26,7 +26,9 @@ public class GameManager : MonoBehaviour {
     private bool _pendingMainThreadAction = false;
 
     public Animator CamAnimator;
-    public Animator TempleAnimator;
+    public Animator Altar1;
+    public Animator Altar2;
+    public Animator Satan;
 
     public Button StartButton;
     public Text CountText;
@@ -109,9 +111,7 @@ public class GameManager : MonoBehaviour {
         PatternProxyInst.UpdatePattern(patternModel);
         _pendingMainThreadAction = true;
         _pendingActions = PendingActions.StartRound;
-
         
-
 }
 
 
@@ -161,6 +161,23 @@ public class GameManager : MonoBehaviour {
         _networkClient.RequestStartLevel();
     }
     
+    private float PlayInerLEvelAnim() {
+        if (_currentLevel == 0) {
+            Altar1.SetTrigger("SwitchLevel");
+        } else if (_currentLevel == 1) {
+
+            Altar2.SetTrigger("SwitchLevel");
+        }else if (_currentLevel == 2) {
+            
+            Satan.SetTrigger("SwitchLevel");
+        }
+        
+        CamAnimator.SetTrigger("SwitchLevel");
+        
+        
+        return 4;
+    }
+
 
     void Update() {
         if (_pendingMainThreadAction) {
@@ -168,17 +185,16 @@ public class GameManager : MonoBehaviour {
             switch (_pendingActions) {
                 case PendingActions.StartGame:
                     MainMenuUI.SetActive(false);
-                    CamAnimator.SetTrigger("StartIntro");
-                    TempleAnimator.SetTrigger("StartIntro");
+                    CamAnimator.SetTrigger("StartLevel");
                     FloorText.text = "";
+                    Invoke("StartRound", 1);
                     break;
                 case PendingActions.StartRound:
                     _currentLevel++;
-
                     LevelBackground.GetComponent<Renderer>().material.mainTexture = LevelTextures[_currentLevel];
                     IngameUI.SetActive(true);
 					SoundManager.Instance.PlayBackgroundMusic ();
-                    CamAnimator.SetTrigger("StartLevel");
+                    
 
                     PatternProxyInst.StartRound();
                     FloorText.text = "Engrave";
@@ -187,7 +203,7 @@ public class GameManager : MonoBehaviour {
 				case PendingActions.PlayWin:
 					IngameUI.SetActive (false);
 					SoundManager.Instance.PlayLevelWinClip (_numLevelsWon);
-                    Invoke("StartRound", 3);
+                    Invoke("StartRound", PlayInerLEvelAnim());
                     PatternProxyInst.EndRound(true);
 
                     FloorText.text = "DARKNESS!";
@@ -215,4 +231,9 @@ public class GameManager : MonoBehaviour {
     }
 
    
+    public void DoDebugMng() {
+        ServerLevelWon();
+    }
+
+
 }

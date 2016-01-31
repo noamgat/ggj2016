@@ -1,0 +1,209 @@
+fileFormatVersion: 2
+guid: 258d92e5fd2034745a4f783ac8bdef41
+timeCreated: 1454170064
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Plane
+    100004: ToS-MergedGroups_000
+    100006: ToS-MergedGroups_001
+    100008: ToS-MergedGroups_002
+    100010: ToS-MergedGroups_003
+    100012: ToS-MergedGroups_004
+    100014: ToS-MergedGroups_005
+    100016: ToS-MergedGroups_006
+    100018: ToS-MergedGroups_007
+    100020: ToS-MergedGroups_008
+    100022: ToS-MergedGroups_009
+    100024: ToS-MergedGroups_010
+    100026: ToS-MergedGroups_011
+    100028: ToS-MergedGroups_016
+    100030: ToS-MergedGroups_017
+    100032: ToS-MergedGroups_018
+    400000: //RootNode
+    400002: Plane
+    400004: ToS-MergedGroups_000
+    400006: ToS-MergedGroups_001
+    400008: ToS-MergedGroups_002
+    400010: ToS-MergedGroups_003
+    400012: ToS-MergedGroups_004
+    400014: ToS-MergedGroups_005
+    400016: ToS-MergedGroups_006
+    400018: ToS-MergedGroups_007
+    400020: ToS-MergedGroups_008
+    400022: ToS-MergedGroups_009
+    400024: ToS-MergedGroups_010
+    400026: ToS-MergedGroups_011
+    400028: ToS-MergedGroups_016
+    400030: ToS-MergedGroups_017
+    400032: ToS-MergedGroups_018
+    2300000: Plane
+    2300002: ToS-MergedGroups_000
+    2300004: ToS-MergedGroups_001
+    2300006: ToS-MergedGroups_002
+    2300008: ToS-MergedGroups_003
+    2300010: ToS-MergedGroups_004
+    2300012: ToS-MergedGroups_005
+    2300014: ToS-MergedGroups_006
+    2300016: ToS-MergedGroups_007
+    2300018: ToS-MergedGroups_008
+    2300020: ToS-MergedGroups_009
+    2300022: ToS-MergedGroups_010
+    2300024: ToS-MergedGroups_011
+    2300026: ToS-MergedGroups_016
+    2300028: ToS-MergedGroups_017
+    2300030: ToS-MergedGroups_018
+    3300000: Plane
+    3300002: ToS-MergedGroups_000
+    3300004: ToS-MergedGroups_001
+    3300006: ToS-MergedGroups_002
+    3300008: ToS-MergedGroups_003
+    3300010: ToS-MergedGroups_004
+    3300012: ToS-MergedGroups_005
+    3300014: ToS-MergedGroups_006
+    3300016: ToS-MergedGroups_007
+    3300018: ToS-MergedGroups_008
+    3300020: ToS-MergedGroups_009
+    3300022: ToS-MergedGroups_010
+    3300024: ToS-MergedGroups_011
+    3300026: ToS-MergedGroups_016
+    3300028: ToS-MergedGroups_017
+    3300030: ToS-MergedGroups_018
+    4300000: ToS-MergedGroups_011
+    4300002: ToS-MergedGroups_009
+    4300004: ToS-MergedGroups_008
+    4300006: ToS-MergedGroups_007
+    4300008: ToS-MergedGroups_006
+    4300010: ToS-MergedGroups_005
+    4300012: ToS-MergedGroups_004
+    4300014: ToS-MergedGroups_003
+    4300016: ToS-MergedGroups_002
+    4300018: ToS-MergedGroups_001
+    4300020: ToS-MergedGroups_000
+    4300022: ToS-MergedGroups_018
+    4300024: ToS-MergedGroups_017
+    4300026: ToS-MergedGroups_016
+    4300028: Plane
+    4300030: ToS-MergedGroups_010
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Default Take
+      takeName: Default Take
+      firstFrame: 100
+      lastFrame: 249
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Plane
+        weight: 1
+      - path: ToS-MergedGroups_000
+        weight: 1
+      - path: ToS-MergedGroups_001
+        weight: 1
+      - path: ToS-MergedGroups_002
+        weight: 1
+      - path: ToS-MergedGroups_003
+        weight: 1
+      - path: ToS-MergedGroups_004
+        weight: 1
+      - path: ToS-MergedGroups_005
+        weight: 1
+      - path: ToS-MergedGroups_006
+        weight: 1
+      - path: ToS-MergedGroups_007
+        weight: 1
+      - path: ToS-MergedGroups_008
+        weight: 1
+      - path: ToS-MergedGroups_009
+        weight: 1
+      - path: ToS-MergedGroups_010
+        weight: 1
+      - path: ToS-MergedGroups_011
+        weight: 1
+      - path: ToS-MergedGroups_016
+        weight: 1
+      - path: ToS-MergedGroups_017
+        weight: 1
+      - path: ToS-MergedGroups_018
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
