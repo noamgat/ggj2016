@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using System.Collections.Generic;
 using Holoville.HOTween;
 using System;
 
@@ -42,14 +42,15 @@ public class GameManager : MonoBehaviour {
     public Texture[] LevelTextures;
     public GameObject LevelBackground;
 
+    private Queue<Action> _mainThreadActions;
     private int _currentLevel;
 
     public int MinPlayers;
 
     // Use this for initialization
     void Start () {
-        
-        
+
+        _mainThreadActions = new Queue<Action>();
         InitMainMenu();
     }
 
@@ -143,9 +144,14 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    internal void EdgeFilledByPlayer(int playerID, int edgeId) {
-        PatternProxyInst.EdgeFilledByPlayer(playerID, edgeId);
+    private void PerformOnMainThread(System.Action action) {
+        lock (_mainThreadActions) {
+            _mainThreadActions.Enqueue(action);
+        }
+    }
 
+    internal void EdgeFilledByPlayer(int playerID, int edgeId) {
+        PerformOnMainThread(() => PatternProxyInst.EdgeFilledByPlayer(playerID, edgeId));
     }
 
     internal void NotifyFilledEdge(int edgeIndex) {
@@ -228,6 +234,12 @@ public class GameManager : MonoBehaviour {
 
         StartButton.interactable = _numPlayers >= MinPlayers;
         CountText.text = "Souls Connected " + _numPlayers + "/4";
+
+        lock (_mainThreadActions) {
+            while (_mainThreadActions.Count > 0) {
+                _mainThreadActions.Dequeue()();
+            }
+        }
     }
 
    
