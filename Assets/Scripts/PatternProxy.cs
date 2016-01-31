@@ -104,7 +104,7 @@ public class PatternProxy : MonoBehaviour {
 
         // Define the trail length- maximum amount of segments 
         // that can be active at the same time.
-        trailLength = patternModel.edges.Count / GameManagerInst._numPlayers;
+        trailLength = 15;// patternModel.edges.Count / GameManagerInst._numPlayers;
         trailContent = new List<Segment>();
     }
 
