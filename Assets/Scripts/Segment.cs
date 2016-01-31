@@ -60,12 +60,17 @@ public class Segment : MonoBehaviour {
         transform.localScale = new Vector3(1, 1, (VertexB.location - VertexA.location).magnitude);
     }
 
-    public void AddPlayer(int playerIndex){
+    public void AddPlayer(int playerIndex) {
         playerIndexes[playerIndex] = 1;
 
         if (_waveTweenr != null) _waveTweenr.Kill();
         _InitialWave = 0;
-        _waveTweenr =  HOTween.To(this, 0.2f, new TweenParms().Prop("_InitialWave", 1).Loops(2, LoopType.Yoyo));
+        //_waveTweenr = HOTween.To(this, 0.2f, new TweenParms().Prop("_InitialWave", 1).Loops(2, LoopType.Yoyo));
+    }
+
+    // Force stop the segment highlighting 
+    public void RemovePlayer(int playerIndex){
+        playerIndexes[playerIndex] = 0;
     }
 
     public void Splash(float timing, Color splashcolor) {

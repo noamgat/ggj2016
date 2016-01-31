@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour {
 
     public Text FloorText;
 
-    private int _numPlayers;
+    public int _numPlayers;
 	private int _numLevelsWon = 0;
 
 

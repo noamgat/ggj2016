@@ -26,7 +26,8 @@ public class PatternProxy : MonoBehaviour {
 
     public float SegmentLifetime;
     public List<int> Players;
-    
+    private int trailLength; // A limit to how many segments can a trail go
+    private List<Segment> trailContent; // Current trail contents in segments
 
     internal bool _patternNedsUpdate = false;
     internal PatternModel _patternModel;
@@ -100,6 +101,11 @@ public class PatternProxy : MonoBehaviour {
             seg.VertexB = _verteces[patternModel.edges[i][1]];
             seg.Place();
         }
+
+        // Define the trail length- maximum amount of segments 
+        // that can be active at the same time.
+        trailLength = patternModel.edges.Count / GameManagerInst._numPlayers;
+        trailContent = new List<Segment>();
     }
 
     internal void UpdatePattern(PatternModel patternModel) {
@@ -185,10 +191,23 @@ public class PatternProxy : MonoBehaviour {
 					otherVertexTouchTime = GetLastVertexTouchTime (seg.VertexA);
 				}
 				if (otherVertexTouchTime > Time.realtimeSinceStartup - segmentTouchTimeThreshold) {
-					seg.AddPlayer(Players.IndexOf(myID));
-					//seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
-					GameManagerInst.NotifyFilledEdge(_segments.IndexOf(seg));
-				}
+                    // Highlight the segment
+                    seg.AddPlayer(Players.IndexOf(myID));
+                    //seg.AddPlayer(Players.IndexOf(UnityEngine.Random.Range(1, 3)));
+                    GameManagerInst.NotifyFilledEdge(_segments.IndexOf(seg));
+
+                    if (!trailContent.Contains(seg)) { 
+                        // Add the segment to the trail list
+                        trailContent.Add(seg);
+                        // Remove the last bit of the trail segment if it's too long
+                        if (trailContent.Count == trailLength) {
+                            Segment _lastSegment = trailContent[0];
+                            _lastSegment.RemovePlayer(Players.IndexOf(myID));
+                            trailContent.Remove(_lastSegment);
+                        }
+                    }
+
+                }
             }
 
             _lastContact = vertex;
