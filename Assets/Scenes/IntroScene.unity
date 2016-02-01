@@ -6474,7 +6474,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 0ee12bda2b866334eb2787788817ff33, type: 3}
   - {fileID: 2800000, guid: 0ee12bda2b866334eb2787788817ff33, type: 3}
   LevelBackground: {fileID: 865744443}
-  MinPlayers: 1
+  MinPlayers: 2
 --- !u!4 &1504003149
 Transform:
   m_ObjectHideFlags: 0
@@ -6656,7 +6656,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1693363392
 RectTransform:
   m_ObjectHideFlags: 0
